@@ -17,21 +17,6 @@ A live scoreboard display for disc golf events. Pulls real-time scores from the 
 
 ---
 
-## Project Structure
-
-```
-disc-golf-event-buddy/
-├── app.py                  # Flask server — page routes + API endpoints
-├── scraper.py              # PDGA API client + background polling thread
-├── cache.py                # SQLite persistence layer
-├── requirements.txt
-└── templates/
-    ├── landing.html        # Tournament picker + settings page
-    └── scoreboard.html     # Live TV scoreboard display
-```
-
----
-
 ## Quickstart
 
 **1. Install dependencies**
