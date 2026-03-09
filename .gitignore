@@ -49,5 +49,7 @@ cover/
 instance/
 .webassets-cache
 
-# Scrapy stuff:
-.scrapy
+# Sqlite
+*.db
+*.db-shm
+*.dm-wal

@@ -103,6 +103,13 @@
         text-align: right;
       }
 
+      .right-top {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
       #live-badge {
         display: inline-flex;
         align-items: center;
@@ -140,6 +147,75 @@
         font-size: 12px;
         color: var(--muted);
         margin-top: 4px;
+      }
+
+      #cache-badge {
+        color: var(--gold);
+        font-weight: 600;
+        margin-right: 2px;
+      }
+
+      #back-link {
+        display: inline-block;
+        font-family: "Barlow Condensed", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      #back-link:hover {
+        color: var(--accent);
+      }
+
+      #theme-btn {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        color: var(--muted);
+        font-family: "Barlow Condensed", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        cursor: pointer;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      #theme-btn:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* Light theme support on scoreboard */
+      html.light {
+        --bg: #f0f4f8;
+        --surface: #ffffff;
+        --border: #c8d5e2;
+        --accent: #008f6b;
+        --red: #d93636;
+        --gold: #c9a000;
+        --silver: #607080;
+        --bronze: #a05a20;
+        --text: #1a2634;
+        --muted: #3a5268;
+        --text2: #2a3f52;
+      }
+      html.light body {
+        background: var(--bg);
+        color: var(--text);
+      }
+      html.light #header {
+        background: linear-gradient(
+          90deg,
+          #e0e8f0 0%,
+          #d0dce8 60%,
+          #e0e8f0 100%
+        );
       }
 
       /* ── Scroll viewport ── */
@@ -341,7 +417,11 @@
         </div>
       </div>
       <div class="right">
-        <div id="live-badge"><span class="dot"></span> Live</div>
+        <div class="right-top">
+          <div id="live-badge"><span class="dot"></span> Live</div>
+          <button id="theme-btn">☀️ Light</button>
+          <a href="/" id="back-link">⚙ Settings</a>
+        </div>
         <div id="last-updated">Fetching…</div>
       </div>
     </div>
@@ -354,9 +434,47 @@
     <div id="paused-badge">⏸ Scroll paused</div>
 
     <script>
-      const POLL_MS = 30_000; // re-fetch every 30 seconds
-      const SCROLL_PX_S = 60; // pixels per second scroll speed
-      const PAUSE_AFTER_MOUSE_MS = 3000; // resume N ms after last mouse move
+      // ── Cookie helpers ──────────────────────────────────────────
+      const Cookies = {
+        get(name, fallback = null) {
+          const match = document.cookie.match(
+            new RegExp(`(?:^|; )${name}=([^;]*)`),
+          );
+          if (!match) return fallback;
+          try {
+            return JSON.parse(decodeURIComponent(match[1]));
+          } catch {
+            return fallback;
+          }
+        },
+      };
+
+      // ── Load settings from cookies (set on landing page) ────────
+      const SCROLL_PX_S = Cookies.get("scrollSpeed", 60);
+      const POLL_MS = Cookies.get("pollInterval", 30) * 1000;
+      const DIVISION_FILTER = new Set(Cookies.get("divisionFilter", [])); // empty = show all
+      const PAUSE_AFTER_MOUSE_MS = 3000; // resume scroll N ms after last mouse move
+
+      // Apply theme immediately to avoid flash
+      // Apply saved theme immediately (before paint, avoids flash)
+      const isLight = Cookies.get("theme", "dark") === "light";
+      if (isLight) document.documentElement.classList.add("light");
+
+      // Theme toggle button
+      function updateThemeBtn() {
+        const light = document.documentElement.classList.contains("light");
+        const btn = document.getElementById("theme-btn");
+        if (btn) {
+          btn.textContent = light ? "🌙 Dark" : "☀️ Light";
+        }
+      }
+      updateThemeBtn();
+      document.getElementById("theme-btn").addEventListener("click", () => {
+        const nowLight = document.documentElement.classList.toggle("light");
+        const val = nowLight ? "light" : "dark";
+        document.cookie = `theme=${encodeURIComponent(JSON.stringify(val))};path=/;max-age=31536000`;
+        updateThemeBtn();
+      });
 
       let scrollY = 0;
       let paused = false;
@@ -373,11 +491,18 @@
       // ── Fetch & render ────────────────────────────────────────
       async function fetchAndRender() {
         try {
-          const res = await fetch("/scores");
+          const res = await fetch("/api/scores");
           const data = await res.json();
           renderScores(data);
-          document.getElementById("last-updated").textContent =
-            data.last_updated ? `Updated ${data.last_updated}` : "";
+          const fromCache = data.from_cache === true;
+          const updatedEl = document.getElementById("last-updated");
+          if (data.last_updated) {
+            updatedEl.innerHTML = fromCache
+              ? `<span id="cache-badge">● Cached</span> as of ${data.last_updated} — fetching live…`
+              : `Updated ${data.last_updated}`;
+          } else {
+            updatedEl.textContent = "";
+          }
           loading.style.display = "none";
         } catch (e) {
           console.error("Score fetch failed:", e);
@@ -392,7 +517,11 @@
 
         track.innerHTML = "";
 
-        (data.divisions || []).forEach((div) => {
+        // Filter divisions by cookie setting (empty set = show all)
+        const divisions = (data.divisions || []).filter(
+          (div) => DIVISION_FILTER.size === 0 || DIVISION_FILTER.has(div.code),
+        );
+        divisions.forEach((div) => {
           // Division header
           const header = document.createElement("div");
           header.className = "division";
