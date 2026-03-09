@@ -1,4 +1,6 @@
 # Distribution / packaging
+venv/
+__pycache__/
 .Python
 build/
 develop-eggs/
