@@ -4,70 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PDGA Scoreboard — Setup</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="/static/theme.css" />
     <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      /* ── Theme variables — dark (default) ── */
-      :root {
-        --bg: #080c12;
-        --surface: #0f1824;
-        --surface2: #162030;
-        --border: #1e2d40;
-        --border2: #253545;
-        --accent: #00c896;
-        --accent-dim: #00533e;
-        --accent-glow: rgba(0, 200, 150, 0.15);
-        --red: #ff4d4d;
-        --gold: #f5c842;
-        --text: #dde5ee;
-        --text2: #8fa3b8;
-        --muted: #4a5f72;
-        --input-bg: #0f1824;
-        --card-bg: #111d2b;
-        --hover-bg: rgba(0, 200, 150, 0.07);
-        --selected-bg: rgba(0, 200, 150, 0.13);
-      }
-
-      /* ── Light theme ── */
-      body.light {
-        --bg: #f0f4f8;
-        --surface: #ffffff;
-        --surface2: #e8eef5;
-        --border: #c8d5e2;
-        --border2: #b0c0d0;
-        --accent: #008f6b;
-        --accent-dim: #004d3a;
-        --accent-glow: rgba(0, 143, 107, 0.1);
-        --red: #d93636;
-        --gold: #c9a000;
-        --text: #1a2634;
-        --text2: #4a6070;
-        --muted: #8fa3b8;
-        --input-bg: #ffffff;
-        --card-bg: #f8fafb;
-        --hover-bg: rgba(0, 143, 107, 0.06);
-        --selected-bg: rgba(0, 143, 107, 0.1);
-      }
-
+      /* ── Landing-specific overrides not in theme.css ── */
       html,
       body {
         min-height: 100vh;
-        background: var(--bg);
-        color: var(--text);
-        font-family: "Barlow", sans-serif;
-        transition:
-          background 0.3s,
-          color 0.3s;
       }
 
       /* ── Layout ── */

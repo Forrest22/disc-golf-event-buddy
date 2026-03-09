@@ -4,60 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PDGA Live Scoreboard</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="/static/theme.css" />
     <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
+      /* ── Scoreboard-specific variables not in theme.css ── */
       :root {
-        --bg: #0a0e14;
-        --surface: #111720;
-        --border: #1e2a38;
-        --accent: #00c896;
-        --accent-dim: #007a5c;
-        --red: #ff4d4d;
-        --gold: #f5c842;
-        --silver: #a8b8c8;
-        --bronze: #cd7f3a;
-        --text: #e8edf3;
-        --muted: #5a6a7a;
         --header-h: 72px;
       }
 
       html,
       body {
         height: 100%;
-        background: var(--bg);
-        color: var(--text);
-        font-family: "Barlow", sans-serif;
         overflow: hidden;
       }
 
-      /* ── Light theme ── */
-      html.light {
-        --bg: #f0f4f8;
-        --surface: #ffffff;
-        --border: #c8d5e2;
-        --accent: #008f6b;
-        --red: #d93636;
-        --gold: #c9a000;
-        --silver: #607080;
-        --bronze: #a05a20;
-        --text: #1a2634;
-        --muted: #3a5268;
-      }
-      html.light body {
-        background: var(--bg);
-        color: var(--text);
-      }
+      /* Light mode header override */
       html.light #header {
         background: linear-gradient(
           90deg,
