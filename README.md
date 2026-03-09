@@ -6,6 +6,8 @@ A live scoreboard display for disc golf events. Pulls real-time scores from the 
 
 ## Features
 
+<img src="isc-golf-event-buddy.png" alt="Disc Golf Event Buddy Screenshot" width="200" />
+
 - **Live scores** pulled directly from the PDGA live scoring API, refreshed on a configurable interval
 - **Landing page** with searchable/filterable list of current PDGA events
 - **TV scoreboard** — fullscreen, auto-scrolling display with seamless loop

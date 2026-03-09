@@ -463,6 +463,7 @@
       let lastRender = null;
       let totalHeight = 0;
       let vpHeight = 0;
+      let scrollStartTime = null; // set when first render completes; scroll waits 2s after this
 
       // ── Theme toggle ──────────────────────────────────────────────
       function updateThemeBtn() {
@@ -492,6 +493,8 @@
           if (hasDivisions) {
             renderScores(data);
             loading.style.display = "none";
+            // Start the 2-second delay on the very first render only
+            if (scrollStartTime === null) scrollStartTime = performance.now();
 
             const fromCache = data.from_cache === true;
             const updatedEl = document.getElementById("last-updated");
@@ -597,8 +600,12 @@
       }
 
       // ── Smooth scroll loop ────────────────────────────────────────
+      const SCROLL_DELAY_MS = 2000; // wait this long after first render before scrolling
+
       function scrollLoop(ts) {
-        if (lastRender !== null && !paused) {
+        const scrollReady =
+          scrollStartTime !== null && ts - scrollStartTime >= SCROLL_DELAY_MS;
+        if (lastRender !== null && !paused && scrollReady) {
           const delta = (ts - lastRender) / 1000; // seconds
           scrollY += SCROLL_PX_S * delta;
 
