@@ -19,7 +19,7 @@ import time
 import threading
 from datetime import datetime
 import requests
-from cache import save_scores, load_scores
+from src.cache import save_scores, load_scores
 
 # ─────────────────────────────────────────────────────────────
 # PDGA API base URLs

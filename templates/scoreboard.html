@@ -41,6 +41,32 @@
         overflow: hidden;
       }
 
+      /* ── Light theme ── */
+      html.light {
+        --bg: #f0f4f8;
+        --surface: #ffffff;
+        --border: #c8d5e2;
+        --accent: #008f6b;
+        --red: #d93636;
+        --gold: #c9a000;
+        --silver: #607080;
+        --bronze: #a05a20;
+        --text: #1a2634;
+        --muted: #3a5268;
+      }
+      html.light body {
+        background: var(--bg);
+        color: var(--text);
+      }
+      html.light #header {
+        background: linear-gradient(
+          90deg,
+          #e0e8f0 0%,
+          #d0dce8 60%,
+          #e0e8f0 100%
+        );
+      }
+
       /* ── Header ── */
       #header {
         position: fixed;
@@ -103,6 +129,7 @@
         text-align: right;
       }
 
+      /* ── Header right-top row: Live · Dark/Light · Settings ── */
       .right-top {
         display: flex;
         align-items: center;
@@ -143,34 +170,10 @@
         }
       }
 
-      #last-updated {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 4px;
-      }
-
-      #cache-badge {
-        color: var(--gold);
-        font-weight: 600;
-        margin-right: 2px;
-      }
-
+      /* Shared pill-button style for theme toggle and settings link */
+      #theme-btn,
       #back-link {
         display: inline-block;
-        font-family: "Barlow Condensed", sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--muted);
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-      #back-link:hover {
-        color: var(--accent);
-      }
-
-      #theme-btn {
         background: none;
         border: 1px solid var(--border);
         border-radius: 5px;
@@ -182,40 +185,27 @@
         text-transform: uppercase;
         padding: 3px 8px;
         cursor: pointer;
+        text-decoration: none;
         transition:
           color 0.2s,
           border-color 0.2s;
       }
-      #theme-btn:hover {
+      #theme-btn:hover,
+      #back-link:hover {
         color: var(--accent);
         border-color: var(--accent);
       }
 
-      /* Light theme support on scoreboard */
-      html.light {
-        --bg: #f0f4f8;
-        --surface: #ffffff;
-        --border: #c8d5e2;
-        --accent: #008f6b;
-        --red: #d93636;
-        --gold: #c9a000;
-        --silver: #607080;
-        --bronze: #a05a20;
-        --text: #1a2634;
-        --muted: #3a5268;
-        --text2: #2a3f52;
+      #last-updated {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
       }
-      html.light body {
-        background: var(--bg);
-        color: var(--text);
-      }
-      html.light #header {
-        background: linear-gradient(
-          90deg,
-          #e0e8f0 0%,
-          #d0dce8 60%,
-          #e0e8f0 100%
-        );
+
+      #cache-badge {
+        color: var(--gold);
+        font-weight: 600;
+        margin-right: 2px;
       }
 
       /* ── Scroll viewport ── */
@@ -330,20 +320,20 @@
         color: var(--muted);
       }
 
-      /* Round score column */
-      td.round-score {
+      /* Round and Thru columns — identical typography */
+      td.round-score,
+      td.thru {
         font-family: "Barlow Condensed", sans-serif;
         font-weight: 700;
         font-size: 17px;
         text-align: right;
+        color: var(--muted);
       }
 
-      /* Thru column */
+      td.round-score {
+        width: 72px;
+      }
       td.thru {
-        font-family: "Barlow Condensed", sans-serif;
-        font-size: 13px;
-        color: var(--muted);
-        text-align: right;
         width: 56px;
       }
 
@@ -387,8 +377,8 @@
         position: fixed;
         bottom: 20px;
         right: 28px;
-        background: rgba(0, 0, 0, 0.7);
-        color: var(--muted);
+        background: rgba(0, 0, 0, 0.75);
+        color: #a0b8cc; /* fixed light color — badge bg is always dark */
         font-family: "Barlow Condensed", sans-serif;
         font-size: 13px;
         letter-spacing: 2px;
@@ -434,7 +424,7 @@
     <div id="paused-badge">⏸ Scroll paused</div>
 
     <script>
-      // ── Cookie helpers ──────────────────────────────────────────
+      // ── Cookie helpers ────────────────────────────────────────────
       const Cookies = {
         get(name, fallback = null) {
           const match = document.cookie.match(
@@ -449,33 +439,24 @@
         },
       };
 
-      // ── Load settings from cookies (set on landing page) ────────
+      // ── Load settings from cookies (set on landing page) ─────────
       const SCROLL_PX_S = Cookies.get("scrollSpeed", 60);
       const POLL_MS = Cookies.get("pollInterval", 30) * 1000;
       const DIVISION_FILTER = new Set(Cookies.get("divisionFilter", [])); // empty = show all
       const PAUSE_AFTER_MOUSE_MS = 3000; // resume scroll N ms after last mouse move
 
-      // Apply theme immediately to avoid flash
-      // Apply saved theme immediately (before paint, avoids flash)
-      const isLight = Cookies.get("theme", "dark") === "light";
-      if (isLight) document.documentElement.classList.add("light");
-
-      // Theme toggle button
-      function updateThemeBtn() {
-        const light = document.documentElement.classList.contains("light");
-        const btn = document.getElementById("theme-btn");
-        if (btn) {
-          btn.textContent = light ? "🌙 Dark" : "☀️ Light";
-        }
+      // ── Apply saved theme immediately (before paint, avoids flash) ─
+      if (Cookies.get("theme", "dark") === "light") {
+        document.documentElement.classList.add("light");
       }
-      updateThemeBtn();
-      document.getElementById("theme-btn").addEventListener("click", () => {
-        const nowLight = document.documentElement.classList.toggle("light");
-        const val = nowLight ? "light" : "dark";
-        document.cookie = `theme=${encodeURIComponent(JSON.stringify(val))};path=/;max-age=31536000`;
-        updateThemeBtn();
-      });
 
+      // ── DOM refs ──────────────────────────────────────────────────
+      const track = document.getElementById("scroll-track");
+      const viewport = document.getElementById("scroll-viewport");
+      const loading = document.getElementById("loading");
+      const pausedBadge = document.getElementById("paused-badge");
+
+      // ── Scroll state ──────────────────────────────────────────────
       let scrollY = 0;
       let paused = false;
       let lastMouseMove = 0;
@@ -483,32 +464,68 @@
       let totalHeight = 0;
       let vpHeight = 0;
 
-      const track = document.getElementById("scroll-track");
-      const viewport = document.getElementById("scroll-viewport");
-      const loading = document.getElementById("loading");
-      const pausedBadge = document.getElementById("paused-badge");
+      // ── Theme toggle ──────────────────────────────────────────────
+      function updateThemeBtn() {
+        const light = document.documentElement.classList.contains("light");
+        const btn = document.getElementById("theme-btn");
+        if (btn) btn.textContent = light ? "🌙 Dark" : "☀️ Light";
+      }
+      updateThemeBtn();
 
-      // ── Fetch & render ────────────────────────────────────────
+      document.getElementById("theme-btn").addEventListener("click", () => {
+        const nowLight = document.documentElement.classList.toggle("light");
+        const val = nowLight ? "light" : "dark";
+        document.cookie = `theme=${encodeURIComponent(JSON.stringify(val))};path=/;max-age=31536000`;
+        updateThemeBtn();
+      });
+
+      // ── Fetch & render ────────────────────────────────────────────
+      let pollTimer = null;
+
       async function fetchAndRender() {
         try {
           const res = await fetch("/api/scores");
           const data = await res.json();
-          renderScores(data);
-          const fromCache = data.from_cache === true;
-          const updatedEl = document.getElementById("last-updated");
-          if (data.last_updated) {
-            updatedEl.innerHTML = fromCache
-              ? `<span id="cache-badge">● Cached</span> as of ${data.last_updated} — fetching live…`
-              : `Updated ${data.last_updated}`;
+
+          const hasDivisions = data.divisions && data.divisions.length > 0;
+
+          if (hasDivisions) {
+            renderScores(data);
+            loading.style.display = "none";
+
+            const fromCache = data.from_cache === true;
+            const updatedEl = document.getElementById("last-updated");
+            if (data.last_updated) {
+              updatedEl.innerHTML = fromCache
+                ? `<span id="cache-badge">● Cached</span> as of ${data.last_updated} — fetching live…`
+                : `Updated ${data.last_updated}`;
+            } else {
+              updatedEl.textContent = "";
+            }
+
+            // Normal poll interval once we have data
+            clearTimeout(pollTimer);
+            pollTimer = setTimeout(fetchAndRender, POLL_MS);
           } else {
-            updatedEl.textContent = "";
+            // Scraper hasn't returned data yet — show message and retry quickly
+            loading.style.display = "flex";
+            loading.textContent =
+              data.event_name === "Loading…"
+                ? "Fetching scores from PDGA…"
+                : `Loading ${data.event_name}…`;
+            clearTimeout(pollTimer);
+            pollTimer = setTimeout(fetchAndRender, 2000);
           }
-          loading.style.display = "none";
         } catch (e) {
           console.error("Score fetch failed:", e);
+          loading.style.display = "flex";
+          loading.textContent = "Connection error — retrying…";
+          clearTimeout(pollTimer);
+          pollTimer = setTimeout(fetchAndRender, 3000);
         }
       }
 
+      // ── Render scores into the scroll track ──────────────────────
       function renderScores(data) {
         document.getElementById("event-name").textContent =
           data.event_name || "PDGA Event";
@@ -521,11 +538,11 @@
         const divisions = (data.divisions || []).filter(
           (div) => DIVISION_FILTER.size === 0 || DIVISION_FILTER.has(div.code),
         );
+
         divisions.forEach((div) => {
-          // Division header
-          const header = document.createElement("div");
-          header.className = "division";
-          header.innerHTML = `
+          const el = document.createElement("div");
+          el.className = "division";
+          el.innerHTML = `
           <div class="division-header">${div.name} &mdash; ${div.round ? "Rd " + div.round : ""}</div>
           <table>
             <thead>
@@ -559,7 +576,7 @@
             </tbody>
           </table>
         `;
-          track.appendChild(header);
+          track.appendChild(el);
 
           const spacer = document.createElement("div");
           spacer.className = "spacer";
@@ -567,11 +584,10 @@
         });
 
         // Duplicate content for seamless loop
-        const clone = track.innerHTML;
-        track.innerHTML += clone;
+        track.innerHTML += track.innerHTML;
 
         vpHeight = viewport.clientHeight;
-        totalHeight = track.scrollHeight / 2; // half because duplicated
+        totalHeight = track.scrollHeight / 2; // half because content is duplicated
       }
 
       function scoreClass(score) {
@@ -580,13 +596,13 @@
         return "even";
       }
 
-      // ── Smooth scroll loop ────────────────────────────────────
+      // ── Smooth scroll loop ────────────────────────────────────────
       function scrollLoop(ts) {
         if (lastRender !== null && !paused) {
           const delta = (ts - lastRender) / 1000; // seconds
           scrollY += SCROLL_PX_S * delta;
 
-          // Seamless loop: when we've scrolled one full copy, jump back
+          // Seamless loop: when we've scrolled one full copy, reset
           if (totalHeight > 0 && scrollY >= totalHeight) {
             scrollY -= totalHeight;
           }
@@ -604,16 +620,15 @@
         requestAnimationFrame(scrollLoop);
       }
 
-      // ── Mouse pause ───────────────────────────────────────────
+      // ── Mouse pause ───────────────────────────────────────────────
       document.addEventListener("mousemove", () => {
         lastMouseMove = Date.now();
         paused = true;
         pausedBadge.classList.add("visible");
       });
 
-      // ── Init ──────────────────────────────────────────────────
+      // ── Init ──────────────────────────────────────────────────────
       fetchAndRender();
-      setInterval(fetchAndRender, POLL_MS);
       requestAnimationFrame(scrollLoop);
     </script>
   </body>

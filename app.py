@@ -19,14 +19,14 @@ On the TV, press F11 for fullscreen after launching the scoreboard.
 """
 
 from flask import Flask, jsonify, render_template, request, redirect, url_for
-from scraper import (
+from src.scraper import (
     fetch_current_events,
     fetch_event_info,
     get_active_scores,
     set_active_tournament,
     start_scraper,
 )
-from cache import list_cached, delete_cache
+from src.cache import list_cached, delete_cache
 
 app = Flask(__name__)
 

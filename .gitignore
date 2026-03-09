@@ -52,4 +52,4 @@ instance/
 # Sqlite
 *.db
 *.db-shm
-*.dm-wal
+*.db-wal

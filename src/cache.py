@@ -24,7 +24,7 @@ from pathlib import Path
 # ─────────────────────────────────────────────────────────────
 
 # Path to the SQLite database file (sits next to this script)
-DB_PATH = Path(__file__).parent / "scoreboard_cache.db"
+DB_PATH = Path(__file__).parent.parent / "scoreboard_cache.db"
 
 # How old a cached entry can be before the scraper ignores it on startup.
 # During live polling the scraper always refreshes regardless of age;
