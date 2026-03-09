@@ -37,13 +37,13 @@ HEADERS = {
 # Flask reads `active_scores`; landing page writes `active_tourn_id`.
 # ─────────────────────────────────────────────────────────────
 ACTIVE_TOURNAMENT_ID = None          # set when user selects a tournament
-active_scores   = {             # latest fetched scores, served by /api/scores
+active_scores   = dict({             # latest fetched scores, served by /api/scores
     "tourn_id":    None,
     "event_name":  "No tournament selected",
     "event_round": "",
     "last_updated": None,
     "divisions":   [],
-}
+})
 state_lock = threading.Lock()   # guards both active_tourn_id and active_scores
 
 
@@ -58,7 +58,6 @@ def set_active_tournament(tourn_id: str):
     scoreboard can render something while the background fetch is in flight.
     The polling loop will overwrite with fresh PDGA data within one cycle.
     """
-    global ACTIVE_TOURNAMENT_ID
     tid = str(tourn_id)
 
     # Try to serve stale cache immediately — max_age=0 means "any age is fine"
@@ -85,7 +84,7 @@ def set_active_tournament(tourn_id: str):
 def get_active_scores() -> dict:
     """Return a snapshot of the latest scores. Thread-safe."""
     with state_lock:
-        return dict(active_scores)
+        return active_scores
 
 
 # ─────────────────────────────────────────────────────────────
