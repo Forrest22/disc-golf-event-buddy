@@ -17,8 +17,8 @@ Usage:
 
 import time
 import threading
-import requests
 from datetime import datetime
+import requests
 
 # ─────────────────────────────────────────────────────────────
 # CONFIG — set your tournament ID here
@@ -34,9 +34,7 @@ HEADERS = {
     "Accept": "application/json",
 }
 
-# ─────────────────────────────────────────────────────────────
 # Shared state — Flask reads this dict
-# ─────────────────────────────────────────────────────────────
 scores_data = {
     "event_name": "Loading…",
     "event_round": "",
@@ -169,6 +167,7 @@ def fetch_scores():
 # Background polling thread
 # ─────────────────────────────────────────────────────────────
 def scraper_loop():
+    """Updates the scores on a timed loop"""
     while True:
         try:
             event_name, round_label, divisions = fetch_scores()
@@ -185,6 +184,7 @@ def scraper_loop():
 
 
 def start_scraper():
+    """Starts the scraping"""
     t = threading.Thread(target=scraper_loop, daemon=True)
     t.start()
     print("[scraper] Background scraper started.")
