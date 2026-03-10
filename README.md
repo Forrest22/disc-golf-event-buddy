@@ -6,7 +6,7 @@ A live scoreboard display for disc golf events. Pulls real-time scores from the 
 
 ## Features
 
-![Disc Golf Event Buddy Screenshot](disc-golf-event-buddy.png)
+![Disc Golf Event Buddy Screenshot](docs/disc-golf-event-buddy.png)
 
 - **Live scores** pulled directly from the PDGA live scoring API, refreshed on a configurable interval
 - **Landing page** with searchable/filterable list of current PDGA events
@@ -16,26 +16,27 @@ A live scoreboard display for disc golf events. Pulls real-time scores from the 
 - **Configurable settings** — scroll speed, poll interval, and division filter stored as cookies
 - **SQLite cache** — scores persist to disk so reloading the scoreboard is instant even after a server restart
 - **Bookmarkable URLs** — scoreboard URL includes `?tournId=` so you can link directly to an event
+- **Deployable Static Sites** — deploy an example website to GitHub Pages
 
 ---
 
 ## Quickstart
 
-**1. Install dependencies**
+### **1. Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**2. Run the server**
+### **2. Run the server**
 
 ```bash
 python app.py
 ```
 
-**3. Open the app**
+### **3. Open the app**
 
-```
+```bash
 http://localhost:5000
 ```
 
@@ -60,7 +61,7 @@ The server exposes a small REST API that mirrors PDGA's own naming conventions.
 
 ## PDGA API Endpoints Used
 
-```
+```bash
 GET https://www.pdga.com/api/v1/feat/current-events/tournaments
 GET https://www.pdga.com/apps/tournament/live-api/live_results_fetch_event?TournID=<id>
 GET https://www.pdga.com/apps/tournament/live-api/live_results_fetch_round?TournID=<id>&Division=<div>&Round=<n>
@@ -95,8 +96,24 @@ curl -X DELETE http://localhost:5000/api/cache/<tournId>
 
 ---
 
-## Requirements
+## Development
+
+### Requirements
 
 - Python 3.10+
 - Network access to `pdga.com`
 - A browser on the display machine (Chrome or Firefox recommended for fullscreen)
+
+### Deploying Statically
+
+#### Find a tournament ID
+
+```bash
+bashpython build_static.py --list-events
+```
+
+#### Build the snapshot
+
+```bash
+bashpython build_static.py --tourn-id 12345 --repo your-username/disc-golf-event-buddy
+```

@@ -17,7 +17,7 @@ PDGA API endpoints used:
 
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 from src.cache import save_scores, load_scores
 
@@ -36,14 +36,14 @@ HEADERS = {
 # Shared scraper state — one active tournament at a time.
 # Flask reads `active_scores`; landing page writes `active_tourn_id`.
 # ─────────────────────────────────────────────────────────────
-ACTIVE_TOURNAMENT_ID = None          # set when user selects a tournament
-active_scores   = dict({             # latest fetched scores, served by /api/scores
+active_tourn_id = None          # set when user selects a tournament
+active_scores   = {             # latest fetched scores, served by /api/scores
     "tourn_id":    None,
     "event_name":  "No tournament selected",
     "event_round": "",
     "last_updated": None,
     "divisions":   [],
-})
+}
 state_lock = threading.Lock()   # guards both active_tourn_id and active_scores
 
 
@@ -58,13 +58,14 @@ def set_active_tournament(tourn_id: str):
     scoreboard can render something while the background fetch is in flight.
     The polling loop will overwrite with fresh PDGA data within one cycle.
     """
+    global active_tourn_id
     tid = str(tourn_id)
 
     # Try to serve stale cache immediately — max_age=0 means "any age is fine"
     cached = load_scores(tid, max_age=0)
 
     with state_lock:
-        ACTIVE_TOURNAMENT_ID = tid
+        active_tourn_id = tid
         if cached:
             # Serve cached data right away; mark it so the frontend knows
             cached["from_cache"] = True
@@ -84,7 +85,7 @@ def set_active_tournament(tourn_id: str):
 def get_active_scores() -> dict:
     """Return a snapshot of the latest scores. Thread-safe."""
     with state_lock:
-        return active_scores
+        return dict(active_scores)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -224,6 +225,7 @@ def _build_scores(tourn_id: str) -> dict:
         "tourn_id":    tourn_id,
         "event_name":  event_name,
         "event_round": round_label,
+        "end_date":    event.get("EndDate"),   # ISO date string e.g. "2026-03-08"
         "last_updated": datetime.now().strftime("%I:%M:%S %p"),
         "divisions":   divisions_out,
     }
@@ -232,32 +234,69 @@ def _build_scores(tourn_id: str) -> dict:
 # ─────────────────────────────────────────────────────────────
 # Background polling loop
 # ─────────────────────────────────────────────────────────────
+def _tournament_is_over(tourn_id: str) -> bool:
+    """
+    Returns True if the tournament ended more than 1 day ago AND we have
+    a cached result for it — meaning there is no point re-fetching from PDGA.
+
+    Uses the end_date stored inside the cached scores dict (put there by
+    _build_scores) so we don't need an extra API call to check.
+    """
+    cached = load_scores(tourn_id, max_age=0)   # any age — we just want end_date
+    if not cached:
+        return False   # no cache → must fetch at least once
+
+    end_date_str = cached.get("end_date")
+    if not end_date_str:
+        return False   # no end_date stored → can't tell, fetch anyway
+
+    try:
+        # end_date is "YYYY-MM-DD"; compare against today in UTC
+        end_date = datetime.strptime(end_date_str[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        now      = datetime.now(timezone.utc)
+        days_ago = (now - end_date).days
+        if days_ago > 1:
+            print(f"[scraper] TournID={tourn_id} ended {days_ago} day(s) ago — skipping PDGA fetch, serving cache")
+            return True
+    except ValueError:
+        pass   # malformed date → fetch anyway
+
+    return False
+
+
 def _scraper_loop(poll_interval: int = 30):
     """
     Continuously polls PDGA for the active tournament's scores.
     Sleeps poll_interval seconds between fetches.
     Skips gracefully if no tournament is selected.
+    Skips PDGA fetch entirely if the tournament ended more than 1 day ago
+    and a cached result already exists.
     """
     while True:
         tid = None
         with state_lock:
-            tid = ACTIVE_TOURNAMENT_ID
+            tid = active_tourn_id
 
         if tid:
-            try:
-                scores = _build_scores(tid)
-                # Persist to SQLite before updating in-memory state
-                save_scores(tid, scores)
+            if _tournament_is_over(tid):
+                # Tournament is finished and cached — no need to re-fetch.
+                # active_scores was already warmed from cache in set_active_tournament,
+                # so we just sleep and check again next cycle (in case user switches events).
+                pass
+            else:
+                try:
+                    scores = _build_scores(tid)
+                    # Persist to SQLite before updating in-memory state
+                    save_scores(tid, scores)
 
-                with state_lock:
-                    # Only update if the tournament hasn't changed mid-fetch
-                    if ACTIVE_TOURNAMENT_ID == tid:
-                        scores["from_cache"] = False
-                        active_scores.update(scores)
-                print(f"[scraper] TournID={tid} — updated {len(scores['divisions'])} "
-                      f"divisions at {scores['last_updated']} (saved to cache)")
-            except Exception as e:
-                print(f"[scraper] Error fetching TournID={tid}: {e}")
+                    with state_lock:
+                        # Only update if the tournament hasn't changed mid-fetch
+                        if active_tourn_id == tid:
+                            scores["from_cache"] = False
+                            active_scores.update(scores)
+                    print(f"[scraper] TournID={tid} — updated {len(scores['divisions'])} divisions at {scores['last_updated']} (saved to cache)")
+                except Exception as e:
+                    print(f"[scraper] Error fetching TournID={tid}: {e}")
         else:
             print("[scraper] No active tournament, waiting…")
 

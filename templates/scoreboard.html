@@ -3,43 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PDGA Live Scoreboard</title>
-    <link rel="stylesheet" href="/static/theme.css" />
+    <title>{% block title %}PDGA Live Scoreboard{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{% block theme_css_path %}/static/theme.css{% endblock %}"
+    />
     <style>
       /* ── Scoreboard-specific variables not in theme.css ── */
-      :root {
-        --header-h: 72px;
-      }
+      :root { --header-h: 72px; }
 
-      html,
-      body {
-        height: 100%;
-        overflow: hidden;
-      }
+      html, body { height: 100%; overflow: hidden; }
 
       /* Light mode header override */
-      html.light #header {
-        background: linear-gradient(
-          90deg,
-          #e0e8f0 0%,
-          #d0dce8 60%,
-          #e0e8f0 100%
-        );
-      }
+      html.light #header { background: linear-gradient(90deg, #e0e8f0 0%, #d0dce8 60%, #e0e8f0 100%); }
 
       /* ── Header ── */
       #header {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: var(--header-h);
-        background: linear-gradient(
-          90deg,
-          #0d1520 0%,
-          #112233 60%,
-          #0d1520 100%
-        );
+        background: linear-gradient(90deg, #0d1520 0%, #112233 60%, #0d1520 100%);
         border-bottom: 2px solid var(--accent);
         display: flex;
         align-items: center;
@@ -55,19 +38,16 @@
       }
 
       #header .disc-icon {
-        width: 40px;
-        height: 40px;
+        width: 40px; height: 40px;
         border-radius: 50%;
         border: 3px solid var(--accent);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         font-size: 20px;
-        box-shadow: 0 0 16px rgba(0, 200, 150, 0.4);
+        box-shadow: 0 0 16px rgba(0,200,150,0.4);
       }
 
       #event-name {
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 26px;
         font-weight: 800;
         letter-spacing: 1px;
@@ -76,7 +56,7 @@
       }
 
       #event-round {
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 16px;
         font-weight: 600;
         color: var(--accent);
@@ -85,9 +65,7 @@
         margin-top: 2px;
       }
 
-      #header .right {
-        text-align: right;
-      }
+      #header .right { text-align: right; }
 
       /* ── Header right-top row: Live · Dark/Light · Settings ── */
       .right-top {
@@ -103,7 +81,7 @@
         gap: 6px;
         background: var(--red);
         color: #fff;
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 13px;
         font-weight: 700;
         letter-spacing: 2px;
@@ -113,32 +91,25 @@
       }
 
       #live-badge .dot {
-        width: 7px;
-        height: 7px;
+        width: 7px; height: 7px;
         background: #fff;
         border-radius: 50%;
         animation: blink 1.2s ease-in-out infinite;
       }
 
       @keyframes blink {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.2;
-        }
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.2; }
       }
 
       /* Shared pill-button style for theme toggle and settings link */
-      #theme-btn,
-      #back-link {
+      #theme-btn, #back-link {
         display: inline-block;
         background: none;
         border: 1px solid var(--border);
         border-radius: 5px;
         color: var(--muted);
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 2px;
@@ -146,12 +117,9 @@
         padding: 3px 8px;
         cursor: pointer;
         text-decoration: none;
-        transition:
-          color 0.2s,
-          border-color 0.2s;
+        transition: color 0.2s, border-color 0.2s;
       }
-      #theme-btn:hover,
-      #back-link:hover {
+      #theme-btn:hover, #back-link:hover {
         color: var(--accent);
         border-color: var(--accent);
       }
@@ -172,9 +140,7 @@
       #scroll-viewport {
         position: fixed;
         top: var(--header-h);
-        left: 0;
-        right: 0;
-        bottom: 0;
+        left: 0; right: 0; bottom: 0;
         overflow: hidden;
       }
 
@@ -190,8 +156,8 @@
       }
 
       .division-header {
-        font-family: "Barlow Condensed", sans-serif;
-        font-size: 20px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 13px;
         font-weight: 700;
         letter-spacing: 4px;
         text-transform: uppercase;
@@ -208,7 +174,7 @@
       }
 
       thead th {
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 2px;
@@ -218,18 +184,14 @@
         text-align: left;
       }
 
-      thead th.num {
-        text-align: right;
-      }
+      thead th.num { text-align: right; }
 
       tbody tr {
         border-bottom: 1px solid var(--border);
         transition: background 0.2s;
       }
 
-      tbody tr:hover {
-        background: rgba(255, 255, 255, 0.03);
-      }
+      tbody tr:hover { background: rgba(255,255,255,0.03); }
 
       tbody td {
         padding: 10px 10px;
@@ -238,22 +200,16 @@
 
       /* Place column */
       td.place {
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 15px;
         font-weight: 700;
         width: 48px;
         color: var(--muted);
       }
 
-      td.place.p1 {
-        color: var(--gold);
-      }
-      td.place.p2 {
-        color: var(--silver);
-      }
-      td.place.p3 {
-        color: var(--bronze);
-      }
+      td.place.p1 { color: var(--gold); }
+      td.place.p2 { color: var(--silver); }
+      td.place.p3 { color: var(--bronze); }
 
       /* Name column */
       td.name {
@@ -263,43 +219,32 @@
 
       /* Score column */
       td.score {
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-weight: 800;
         font-size: 22px;
         text-align: right;
         width: 90px;
       }
 
-      td.score.under {
-        color: var(--accent);
-      }
-      td.score.over {
-        color: var(--red);
-      }
-      td.score.even {
-        color: var(--muted);
-      }
+      td.score.under { color: var(--accent); }
+      td.score.over  { color: var(--red); }
+      td.score.even  { color: var(--muted); }
 
       /* Round and Thru columns — identical typography */
-      td.round-score,
-      td.thru {
-        font-family: "Barlow Condensed", sans-serif;
+      td.round-score, td.thru {
+        font-family: 'Barlow Condensed', sans-serif;
         font-weight: 700;
         font-size: 17px;
         text-align: right;
         color: var(--muted);
       }
 
-      td.round-score {
-        width: 72px;
-      }
-      td.thru {
-        width: 56px;
-      }
+      td.round-score { width: 72px; }
+      td.thru        { width: 56px; }
 
       /* Country badge */
       span.country {
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 11px;
         font-weight: 600;
         letter-spacing: 1px;
@@ -312,9 +257,7 @@
       }
 
       /* ── Gap spacer between divisions ── */
-      .spacer {
-        height: 24px;
-      }
+      .spacer { height: 24px; }
 
       /* ── Loading state ── */
       #loading {
@@ -324,7 +267,7 @@
         align-items: center;
         justify-content: center;
         background: var(--bg);
-        font-family: "Barlow Condensed", sans-serif;
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 24px;
         letter-spacing: 4px;
         color: var(--muted);
@@ -337,9 +280,9 @@
         position: fixed;
         bottom: 20px;
         right: 28px;
-        background: rgba(0, 0, 0, 0.75);
-        color: #a0b8cc; /* fixed light color — badge bg is always dark */
-        font-family: "Barlow Condensed", sans-serif;
+        background: rgba(0,0,0,0.75);
+        color: #a0b8cc;  /* fixed light color — badge bg is always dark */
+        font-family: 'Barlow Condensed', sans-serif;
         font-size: 13px;
         letter-spacing: 2px;
         padding: 6px 14px;
@@ -349,9 +292,8 @@
         transition: opacity 0.4s;
         pointer-events: none;
       }
-      #paused-badge.visible {
-        opacity: 1;
-      }
+      #paused-badge.visible { opacity: 1; }
+      {% block extra_css %}{% endblock %}
     </style>
   </head>
   <body>
@@ -368,11 +310,15 @@
       </div>
       <div class="right">
         <div class="right-top">
+          {% block header_badges %}
           <div id="live-badge"><span class="dot"></span> Live</div>
           <button id="theme-btn">☀️ Light</button>
           <a href="/" id="back-link">⚙ Settings</a>
+          {% endblock %}
         </div>
-        <div id="last-updated">Fetching…</div>
+        <div id="last-updated">
+          {% block last_updated_text %}Fetching…{% endblock %}
+        </div>
       </div>
     </div>
 
@@ -382,27 +328,24 @@
     </div>
 
     <div id="paused-badge">⏸ Scroll paused</div>
+    {% block extra_html %}{% endblock %}
 
     <script>
+      {% block data_js %}{% endblock %}
+      {% block fetch_js %}
       // ── Cookie helpers ────────────────────────────────────────────
       const Cookies = {
         get(name, fallback = null) {
-          const match = document.cookie.match(
-            new RegExp(`(?:^|; )${name}=([^;]*)`),
-          );
+          const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
           if (!match) return fallback;
-          try {
-            return JSON.parse(decodeURIComponent(match[1]));
-          } catch {
-            return fallback;
-          }
+          try { return JSON.parse(decodeURIComponent(match[1])); } catch { return fallback; }
         },
       };
 
       // ── Load settings from cookies (set on landing page) ─────────
-      const SCROLL_PX_S = Cookies.get("scrollSpeed", 60);
-      const POLL_MS = Cookies.get("pollInterval", 30) * 1000;
-      const DIVISION_FILTER = new Set(Cookies.get("divisionFilter", [])); // empty = show all
+      const SCROLL_PX_S          = Cookies.get("scrollSpeed", 60);
+      const POLL_MS              = Cookies.get("pollInterval", 30) * 1000;
+      const DIVISION_FILTER      = new Set(Cookies.get("divisionFilter", [])); // empty = show all
       const PAUSE_AFTER_MOUSE_MS = 3000; // resume scroll N ms after last mouse move
 
       // ── Apply saved theme immediately (before paint, avoids flash) ─
@@ -411,24 +354,24 @@
       }
 
       // ── DOM refs ──────────────────────────────────────────────────
-      const track = document.getElementById("scroll-track");
-      const viewport = document.getElementById("scroll-viewport");
-      const loading = document.getElementById("loading");
+      const track       = document.getElementById("scroll-track");
+      const viewport    = document.getElementById("scroll-viewport");
+      const loading     = document.getElementById("loading");
       const pausedBadge = document.getElementById("paused-badge");
 
       // ── Scroll state ──────────────────────────────────────────────
-      let scrollY = 0;
-      let paused = false;
-      let lastMouseMove = 0;
-      let lastRender = null;
-      let totalHeight = 0;
-      let vpHeight = 0;
+      let scrollY         = 0;
+      let paused          = false;
+      let lastMouseMove   = 0;
+      let lastRender      = null;
+      let totalHeight     = 0;
+      let vpHeight        = 0;
       let scrollStartTime = null; // set when first render completes; scroll waits 2s after this
 
       // ── Theme toggle ──────────────────────────────────────────────
       function updateThemeBtn() {
         const light = document.documentElement.classList.contains("light");
-        const btn = document.getElementById("theme-btn");
+        const btn   = document.getElementById("theme-btn");
         if (btn) btn.textContent = light ? "🌙 Dark" : "☀️ Light";
       }
       updateThemeBtn();
@@ -445,7 +388,7 @@
 
       async function fetchAndRender() {
         try {
-          const res = await fetch("/api/scores");
+          const res  = await fetch("/api/scores");
           const data = await res.json();
 
           const hasDivisions = data.divisions && data.divisions.length > 0;
@@ -456,10 +399,14 @@
             // Start the 2-second delay on the very first render only
             if (scrollStartTime === null) scrollStartTime = performance.now();
 
-            const fromCache = data.from_cache === true;
-            const updatedEl = document.getElementById("last-updated");
+            const fromCache   = data.from_cache === true;
+            const updatedEl   = document.getElementById("last-updated");
+            // Check if the tournament end date has passed — if so, don't
+            // imply we're still fetching live updates
+            const endDate     = data.end_date ? new Date(data.end_date) : null;
+            const isOver      = endDate && endDate < new Date();
             if (data.last_updated) {
-              updatedEl.innerHTML = fromCache
+              updatedEl.innerHTML = (fromCache && !isOver)
                 ? `<span id="cache-badge">● Cached</span> as of ${data.last_updated} — fetching live…`
                 : `Updated ${data.last_updated}`;
             } else {
@@ -472,13 +419,13 @@
           } else {
             // Scraper hasn't returned data yet — show message and retry quickly
             loading.style.display = "flex";
-            loading.textContent =
-              data.event_name === "Loading…"
-                ? "Fetching scores from PDGA…"
-                : `Loading ${data.event_name}…`;
+            loading.textContent = data.event_name === "Loading…"
+              ? "Fetching scores from PDGA…"
+              : `Loading ${data.event_name}…`;
             clearTimeout(pollTimer);
             pollTimer = setTimeout(fetchAndRender, 2000);
           }
+
         } catch (e) {
           console.error("Score fetch failed:", e);
           loading.style.display = "flex";
@@ -488,57 +435,53 @@
         }
       }
 
+      {% endblock %}
+
       // ── Render scores into the scroll track ──────────────────────
       function renderScores(data) {
-        document.getElementById("event-name").textContent =
-          data.event_name || "PDGA Event";
-        document.getElementById("event-round").textContent =
-          data.event_round || "";
+        document.getElementById("event-name").textContent  = data.event_name  || "PDGA Event";
+        document.getElementById("event-round").textContent = data.event_round || "";
 
         track.innerHTML = "";
 
         // Filter divisions by cookie setting (empty set = show all)
-        const divisions = (data.divisions || []).filter(
-          (div) => DIVISION_FILTER.size === 0 || DIVISION_FILTER.has(div.code),
+        const divisions = (data.divisions || []).filter(div =>
+          DIVISION_FILTER.size === 0 || DIVISION_FILTER.has(div.code)
         );
 
-        divisions.forEach((div) => {
+        divisions.forEach(div => {
           const el = document.createElement("div");
           el.className = "division";
           el.innerHTML = `
-          <div class="division-header">${div.name} &mdash; ${div.round ? "Round " + div.round : ""}</div>
-          <table>
-            <thead>
-              <tr>
-                <th style="width:52px">#</th>
-                <th>Player</th>
-                <th class="num" style="width:80px">Total</th>
-                <th class="num" style="width:72px">Round</th>
-                <th class="num" style="width:56px">Thru</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${div.players
-                .map(
-                  (p) => `
+            <div class="division-header">${div.name} &mdash; ${div.round ? 'Rd ' + div.round : ''}</div>
+            <table>
+              <thead>
                 <tr>
-                  <td class="place ${p.place === 1 ? "p1" : p.place === 2 ? "p2" : p.place === 3 ? "p3" : ""}">
-                    ${p.place === 1 ? "🥇" : p.place === 2 ? "🥈" : p.place === 3 ? "🥉" : p.place_display}
-                  </td>
-                  <td class="name">
-                    ${p.name}
-                    ${p.country ? `<span class="country">${p.country}</span>` : ""}
-                  </td>
-                  <td class="score ${scoreClass(p.score)}">${p.score_display}</td>
-                  <td class="round-score ${scoreClass(p.score)}" style="opacity:0.65">${p.round_score}</td>
-                  <td class="thru">${p.thru}</td>
+                  <th style="width:52px">#</th>
+                  <th>Player</th>
+                  <th class="num" style="width:80px">Total</th>
+                  <th class="num" style="width:72px">Round</th>
+                  <th class="num" style="width:56px">Thru</th>
                 </tr>
-              `,
-                )
-                .join("")}
-            </tbody>
-          </table>
-        `;
+              </thead>
+              <tbody>
+                ${div.players.map(p => `
+                  <tr>
+                    <td class="place ${p.place === 1 ? 'p1' : p.place === 2 ? 'p2' : p.place === 3 ? 'p3' : ''}">
+                      ${p.place === 1 ? '🥇' : p.place === 2 ? '🥈' : p.place === 3 ? '🥉' : p.place_display}
+                    </td>
+                    <td class="name">
+                      ${p.name}
+                      ${p.country ? `<span class="country">${p.country}</span>` : ''}
+                    </td>
+                    <td class="score ${scoreClass(p.score)}">${p.score_display}</td>
+                    <td class="round-score ${scoreClass(p.score)}" style="opacity:0.65">${p.round_score}</td>
+                    <td class="thru">${p.thru}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          `;
           track.appendChild(el);
 
           const spacer = document.createElement("div");
@@ -549,7 +492,7 @@
         // Duplicate content for seamless loop
         track.innerHTML += track.innerHTML;
 
-        vpHeight = viewport.clientHeight;
+        vpHeight    = viewport.clientHeight;
         totalHeight = track.scrollHeight / 2; // half because content is duplicated
       }
 
@@ -563,8 +506,7 @@
       const SCROLL_DELAY_MS = 2000; // wait this long after first render before scrolling
 
       function scrollLoop(ts) {
-        const scrollReady =
-          scrollStartTime !== null && ts - scrollStartTime >= SCROLL_DELAY_MS;
+        const scrollReady = scrollStartTime !== null && (ts - scrollStartTime) >= SCROLL_DELAY_MS;
         if (lastRender !== null && !paused && scrollReady) {
           const delta = (ts - lastRender) / 1000; // seconds
           scrollY += SCROLL_PX_S * delta;
@@ -578,7 +520,7 @@
         }
 
         // Auto-resume after mouse idle
-        if (paused && Date.now() - lastMouseMove > PAUSE_AFTER_MOUSE_MS) {
+        if (paused && (Date.now() - lastMouseMove) > PAUSE_AFTER_MOUSE_MS) {
           paused = false;
           pausedBadge.classList.remove("visible");
         }
@@ -595,7 +537,9 @@
       });
 
       // ── Init ──────────────────────────────────────────────────────
+      {% block init_js %}
       fetchAndRender();
+      {% endblock %}
       requestAnimationFrame(scrollLoop);
     </script>
   </body>
