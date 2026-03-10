@@ -1,7 +1,4 @@
 # Distribution / packaging
-docs/index.html
-docs/scoreboard.js
-docs/theme.css
 venv/
 __pycache__/
 .Python

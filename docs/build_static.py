@@ -304,6 +304,7 @@ def build_html(scores: dict, out_path: Path, gh_repo: str):
     html = html.replace("__SCORES_JSON__", _json_for_script(scores))
 
     scoreboard_path = out_path / "scoreboard.html"
+    scoreboard_path.parent.mkdir(parents=True, exist_ok=True)
     scoreboard_path.write_text(html, encoding="utf-8")
     print(f"Written to {scoreboard_path}  ({scoreboard_path.stat().st_size // 1024} KB)")
 
@@ -325,7 +326,7 @@ def build_html(scores: dict, out_path: Path, gh_repo: str):
     html     = html.replace("__EVENT_JSON__", _json_for_script(event_info))
     html     = html.replace("__DIVS_JSON__",  _json_for_script(divs))
 
-    landing_path = out_path / "landing.html"
+    landing_path = out_path / "index.html"
     landing_path.write_text(html, encoding="utf-8")
     print(f"Written to {landing_path}  ({landing_path.stat().st_size // 1024} KB)")
 
@@ -352,7 +353,7 @@ def main():
     if not args.tourn_id:
         parser.error("--tourn-id is required (or use --list-events to find one)")
 
-    build(tourn_id=args.tourn_id, out_path=Path("docs/"), gh_repo=args.repo)
+    build(tourn_id=args.tourn_id, out_path=Path("docs/demo"), gh_repo=args.repo)
 
 
 if __name__ == "__main__":
