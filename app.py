@@ -11,7 +11,7 @@ Routes:
   GET  /api/scores                → latest scores for the active tournament
 
 Run with:
-  pip install flask requests beautifulsoup4
+  pip install -r requirements.txt
   python app.py
 
 Then open http://localhost:5000 in the browser.
