@@ -8,6 +8,8 @@ A live scoreboard display for disc golf events. Pulls real-time scores from the 
 
 ![Disc Golf Event Buddy Screenshot](docs/disc-golf-event-buddy.png)
 
+**[See the demo here!](https://forrest22.github.io/disc-golf-event-buddy/demo/)**
+
 - **Live scores** pulled directly from the PDGA live scoring API, refreshed on a configurable interval
 - **Landing page** with searchable/filterable list of current PDGA events
 - **TV scoreboard** — fullscreen, auto-scrolling display with seamless loop
