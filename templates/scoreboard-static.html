@@ -1,0 +1,67 @@
+{% extends "scoreboard.html" %}
+
+{% block title %}{{ event_name }} -- PDGA Scoreboard Snapshot{% endblock %}
+
+{% block theme_css_path %}theme.css{% endblock %}
+{% block scoreboard_js_src %}scoreboard.js{% endblock %}
+
+{% block extra_css %}
+#static-banner {
+position: fixed;
+bottom: 0; left: 0; right: 0;
+background: rgba(0, 0, 0, 0.75);
+color: #a0b8cc;
+font-family: 'Barlow Condensed', sans-serif;
+font-size: 12px;
+letter-spacing: 2px;
+text-transform: uppercase;
+text-align: center;
+padding: 5px;
+z-index: 300;
+}
+#scroll-viewport { bottom: 24px; }
+#snapshot-badge {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background: var(--muted);
+color: #fff;
+font-family: 'Barlow Condensed', sans-serif;
+font-size: 13px;
+font-weight: 700;
+letter-spacing: 2px;
+padding: 4px 10px;
+border-radius: 4px;
+text-transform: uppercase;
+}
+{% endblock %}
+
+{% block header_badges %}
+<div id="snapshot-badge">&#x1F4F8; Snapshot</div>
+<button id="theme-btn">&#x2600;&#xFE0F; Light</button>
+{% endblock %}
+
+{% block last_updated_text %}Snapshot taken {{ last_updated }}{% endblock %}
+
+{% block extra_html %}
+<div id="static-banner">
+    &#x1F4F8; Snapshot &middot; {{ snapshot_date }} &middot; github.com/{{ gh_repo }}
+</div>
+{% endblock %}
+
+{# Inject baked scores before scoreboard.js loads so it can reference SCORES #}
+{%- block data_js %}
+const SCORES = __SCORES_JSON__;
+{%- endblock %}
+
+{# No polling needed -- strip fetch machinery entirely #}
+{%- block fetch_js %}{% endblock %}
+
+{# Render from baked data instead of fetching #}
+{%- block init_js %}
+renderScores(SCORES);
+document.getElementById("event-name").textContent = SCORES.event_name || "PDGA Event";
+document.getElementById("event-round").textContent = SCORES.event_round || "";
+document.getElementById("loading").style.display = "none";
+scrollStartTime = performance.now();
+{%- endblock %}

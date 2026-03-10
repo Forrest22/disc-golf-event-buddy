@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discraft presents Throw Down the Mountain XIV - Weekend 1 -- PDGA Scoreboard Snapshot</title>
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    /* ── Scoreboard-specific variables not in theme.css ── */
+    :root {
+      --header-h: 72px;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Light mode header override */
+    html.light #header {
+      background: linear-gradient(90deg, #e0e8f0 0%, #d0dce8 60%, #e0e8f0 100%);
+    }
+
+    /* ── Header ── */
+    #header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: linear-gradient(90deg, #0d1520 0%, #112233 60%, #0d1520 100%);
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      z-index: 100;
+    }
+
+    #header .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    #header .disc-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 16px rgba(0, 200, 150, 0.4);
+    }
+
+    #event-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    #event-round {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    #header .right {
+      text-align: right;
+    }
+
+    /* ── Header right-top row: Live · Dark/Light · Settings ── */
+    .right-top {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    #live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    #live-badge .dot {
+      width: 7px;
+      height: 7px;
+      background: #fff;
+      border-radius: 50%;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.2;
+      }
+    }
+
+    /* Shared pill-button style for theme toggle and settings link */
+    #theme-btn,
+    #back-link {
+      display: inline-block;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    #theme-btn:hover,
+    #back-link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    #last-updated {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    #cache-badge {
+      color: var(--gold);
+      font-weight: 600;
+      margin-right: 2px;
+    }
+
+    /* ── Scroll viewport ── */
+    #scroll-viewport {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+    }
+
+    #scroll-track {
+      display: flex;
+      flex-direction: column;
+      will-change: transform;
+    }
+
+    /* ── Division block ── */
+    .division {
+      padding: 28px 40px 12px;
+    }
+
+    .division-header {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Score table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 10px;
+      text-align: left;
+    }
+
+    thead th.num {
+      text-align: right;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    tbody td {
+      padding: 10px 10px;
+      font-size: 17px;
+    }
+
+    /* Place column */
+    td.place {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      width: 48px;
+      color: var(--muted);
+    }
+
+    td.place.p1 {
+      color: var(--gold);
+    }
+
+    td.place.p2 {
+      color: var(--silver);
+    }
+
+    td.place.p3 {
+      color: var(--bronze);
+    }
+
+    /* Name column */
+    td.name {
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    /* Score column */
+    td.score {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      text-align: right;
+      width: 90px;
+    }
+
+    td.score.under {
+      color: var(--accent);
+    }
+
+    td.score.over {
+      color: var(--red);
+    }
+
+    td.score.even {
+      color: var(--muted);
+    }
+
+    /* Round and Thru columns — identical typography */
+    td.round-score,
+    td.thru {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      text-align: right;
+      color: var(--muted);
+    }
+
+    td.round-score {
+      width: 72px;
+    }
+
+    td.thru {
+      width: 56px;
+    }
+
+    /* Country badge */
+    span.country {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--muted);
+      background: var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ── Gap spacer between divisions ── */
+    .spacer {
+      height: 24px;
+    }
+
+    /* ── Loading state ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+      z-index: 200;
+    }
+
+    /* ── Pause overlay (mouse move) ── */
+    #paused-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 28px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #a0b8cc;
+      /* fixed light color — badge bg is always dark */
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+
+    #paused-badge.visible {
+      opacity: 1;
+    }
+
+      {
+      % block extra_css %
+    }
+
+      {
+      % endblock %
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loading">Loading scores…</div>
+
+  <!-- Header -->
+  <div id="header">
+    <div class="logo-area">
+      <div class="disc-icon">🥏</div>
+      <div>
+        <div id="event-name">Loading event…</div>
+        <div id="event-round"></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="right-top">
+        
+<div id="snapshot-badge">&#x1F4F8; Snapshot</div>
+<button id="theme-btn">&#x2600;&#xFE0F; Light</button>
+
+      </div>
+      <div id="last-updated">Snapshot taken 03:25:36 PM</div>
+    </div>
+  </div>
+
+  <!-- Scrolling content -->
+  <div id="scroll-viewport">
+    <div id="scroll-track"></div>
+  </div>
+
+  <div id="paused-badge">⏸ Scroll paused</div>
+  
+<div id="static-banner">
+    &#x1F4F8; Snapshot &middot; March 10, 2026 6:32 PM &middot; github.com/forrest22/disc-golf-event-buddy
+</div>
+
+
+  <script src="scoreboard.js"></script>
+  <script>
+    
+const SCORES = {
+  "tourn_id": "98453",
+  "event_name": "Discraft presents Throw Down the Mountain XIV - Weekend 1",
+  "event_round": "Round 3",
+  "last_updated": "03:25:36 PM",
+  "divisions": [
+    {
+      "name": "Mixed Pro Open",
+      "code": "MPO",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "T1",
+          "name": "Eagle McMahon",
+          "short_name": "E. McMahon",
+          "score": -30,
+          "score_display": "-30",
+          "round_score": "-11",
+          "thru": "F",
+          "country": "US",
+          "rating": 1040
+        },
+        {
+          "place": 1,
+          "place_display": "T1",
+          "name": "Joel Freeman",
+          "short_name": "J. Freeman",
+          "score": -30,
+          "score_display": "-30",
+          "round_score": "-10",
+          "thru": "F",
+          "country": "US",
+          "rating": 1034
+        },
+        {
+          "place": 3,
+          "place_display": "3",
+          "name": "Elijah Bickel",
+          "short_name": "E. Bickel",
+          "score": -27,
+          "score_display": "-27",
+          "round_score": "-7",
+          "thru": "F",
+          "country": "US",
+          "rating": 1021
+        },
+        {
+          "place": 4,
+          "place_display": "4",
+          "name": "Corey Ellis",
+          "short_name": "C. Ellis",
+          "score": -24,
+          "score_display": "-24",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 1032
+        },
+        {
+          "place": 5,
+          "place_display": "5",
+          "name": "Jonathan Borzick",
+          "short_name": "J. Borzick",
+          "score": -21,
+          "score_display": "-21",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 1029
+        },
+        {
+          "place": 6,
+          "place_display": "T6",
+          "name": "Perry Chase",
+          "short_name": "P. Chase",
+          "score": -20,
+          "score_display": "-20",
+          "round_score": "-11",
+          "thru": "F",
+          "country": "US",
+          "rating": 989
+        },
+        {
+          "place": 6,
+          "place_display": "T6",
+          "name": "Kevin Kiefer III",
+          "short_name": "K. Kiefer III",
+          "score": -20,
+          "score_display": "-20",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 1021
+        },
+        {
+          "place": 8,
+          "place_display": "8",
+          "name": "Benjamin Stemen",
+          "short_name": "B. Stemen",
+          "score": -19,
+          "score_display": "-19",
+          "round_score": "-11",
+          "thru": "F",
+          "country": "US",
+          "rating": 1033
+        },
+        {
+          "place": 9,
+          "place_display": "9",
+          "name": "Dallas Garber",
+          "short_name": "D. Garber",
+          "score": -14,
+          "score_display": "-14",
+          "round_score": "-5",
+          "thru": "F",
+          "country": "US",
+          "rating": 1025
+        },
+        {
+          "place": 10,
+          "place_display": "10",
+          "name": "Ian Burchett",
+          "short_name": "I. Burchett",
+          "score": -12,
+          "score_display": "-12",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 1006
+        },
+        {
+          "place": 11,
+          "place_display": "11",
+          "name": "Dylan Horst",
+          "short_name": "D. Horst",
+          "score": -10,
+          "score_display": "-10",
+          "round_score": "-1",
+          "thru": "F",
+          "country": "US",
+          "rating": 1015
+        },
+        {
+          "place": 12,
+          "place_display": "T12",
+          "name": "Rhyan Greenwell",
+          "short_name": "R. Greenwell",
+          "score": -9,
+          "score_display": "-9",
+          "round_score": "-5",
+          "thru": "F",
+          "country": "US",
+          "rating": 980
+        },
+        {
+          "place": 12,
+          "place_display": "T12",
+          "name": "William Palm",
+          "short_name": "W. Palm",
+          "score": -9,
+          "score_display": "-9",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 975
+        },
+        {
+          "place": 14,
+          "place_display": "14",
+          "name": "Zack Kitchen",
+          "short_name": "Z. Kitchen",
+          "score": -8,
+          "score_display": "-8",
+          "round_score": "-5",
+          "thru": "F",
+          "country": "US",
+          "rating": 988
+        },
+        {
+          "place": 15,
+          "place_display": "15",
+          "name": "Matthew Henderson",
+          "short_name": "M. Henderson",
+          "score": -4,
+          "score_display": "-4",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 991
+        },
+        {
+          "place": 16,
+          "place_display": "16",
+          "name": "Joshua Vashon",
+          "short_name": "J. Vashon",
+          "score": -3,
+          "score_display": "-3",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 965
+        },
+        {
+          "place": 17,
+          "place_display": "T17",
+          "name": "Caleb Henson",
+          "short_name": "C. Henson",
+          "score": -2,
+          "score_display": "-2",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 981
+        },
+        {
+          "place": 17,
+          "place_display": "T17",
+          "name": "Ben Welfley",
+          "short_name": "B. Welfley",
+          "score": -2,
+          "score_display": "-2",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 967
+        },
+        {
+          "place": 19,
+          "place_display": "19",
+          "name": "Alex Ferry",
+          "short_name": "A. Ferry",
+          "score": -1,
+          "score_display": "-1",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 969
+        },
+        {
+          "place": 20,
+          "place_display": "20",
+          "name": "Edward Ward",
+          "short_name": "E. Ward",
+          "score": 2,
+          "score_display": "+2",
+          "round_score": "-1",
+          "thru": "F",
+          "country": "US",
+          "rating": 995
+        },
+        {
+          "place": 21,
+          "place_display": "21",
+          "name": "Malakai Lawrence",
+          "short_name": "M. Lawrence",
+          "score": 3,
+          "score_display": "+3",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 976
+        },
+        {
+          "place": 22,
+          "place_display": "22",
+          "name": "Griffin Hunt",
+          "short_name": "G. Hunt",
+          "score": 6,
+          "score_display": "+6",
+          "round_score": "+10",
+          "thru": "F",
+          "country": "US",
+          "rating": 958
+        },
+        {
+          "place": 23,
+          "place_display": "23",
+          "name": "Eli Brown",
+          "short_name": "E. Brown",
+          "score": 7,
+          "score_display": "+7",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 967
+        },
+        {
+          "place": 24,
+          "place_display": "24",
+          "name": "Isaac Cullum",
+          "short_name": "I. Cullum",
+          "score": 10,
+          "score_display": "+10",
+          "round_score": "+5",
+          "thru": "F",
+          "country": "US",
+          "rating": 915
+        },
+        {
+          "place": 25,
+          "place_display": "T25",
+          "name": "Brennan Russell",
+          "short_name": "B. Russell",
+          "score": 11,
+          "score_display": "+11",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 957
+        },
+        {
+          "place": 25,
+          "place_display": "T25",
+          "name": "Josh McKisic",
+          "short_name": "J. McKisic",
+          "score": 11,
+          "score_display": "+11",
+          "round_score": "+3",
+          "thru": "F",
+          "country": "US",
+          "rating": 965
+        },
+        {
+          "place": 27,
+          "place_display": "27",
+          "name": "Cameron Messerschmidt",
+          "short_name": "C. Messerschmidt",
+          "score": 13,
+          "score_display": "+13",
+          "round_score": "-1",
+          "thru": "F",
+          "country": "US",
+          "rating": 979
+        },
+        {
+          "place": 28,
+          "place_display": "T28",
+          "name": "Gary Voltz",
+          "short_name": "G. Voltz",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 957
+        },
+        {
+          "place": 28,
+          "place_display": "T28",
+          "name": "Logan Hall",
+          "short_name": "L. Hall",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 947
+        },
+        {
+          "place": 30,
+          "place_display": "30",
+          "name": "Andrew Cook",
+          "short_name": "A. Cook",
+          "score": 16,
+          "score_display": "+16",
+          "round_score": "+9",
+          "thru": "F",
+          "country": "US",
+          "rating": 972
+        },
+        {
+          "place": 31,
+          "place_display": "31",
+          "name": "Christopher Stoddard",
+          "short_name": "C. Stoddard",
+          "score": 17,
+          "score_display": "+17",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 957
+        },
+        {
+          "place": 32,
+          "place_display": "32",
+          "name": "Christopher Milan",
+          "short_name": "C. Milan",
+          "score": 20,
+          "score_display": "+20",
+          "round_score": "+6",
+          "thru": "F",
+          "country": "US",
+          "rating": 947
+        },
+        {
+          "place": 33,
+          "place_display": "33",
+          "name": "Aaron Snanigan",
+          "short_name": "A. Snanigan",
+          "score": 36,
+          "score_display": "+36",
+          "round_score": "+7",
+          "thru": "F",
+          "country": "US",
+          "rating": 878
+        },
+        {
+          "place": 34,
+          "place_display": "34",
+          "name": "Christian Senger",
+          "short_name": "C. Senger",
+          "score": -2,
+          "score_display": "-2",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 967
+        },
+        {
+          "place": 35,
+          "place_display": "35",
+          "name": "John Gibbons",
+          "short_name": "J. Gibbons",
+          "score": 3,
+          "score_display": "+3",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 942
+        },
+        {
+          "place": 36,
+          "place_display": "T36",
+          "name": "Jake Lapierre",
+          "short_name": "J. Lapierre",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 966
+        },
+        {
+          "place": 36,
+          "place_display": "T36",
+          "name": "Steven Andrews",
+          "short_name": "S. Andrews",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 960
+        },
+        {
+          "place": 38,
+          "place_display": "38",
+          "name": "Brandon Cournoyer",
+          "short_name": "B. Cournoyer",
+          "score": 17,
+          "score_display": "+17",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 965
+        },
+        {
+          "place": 39,
+          "place_display": "39",
+          "name": "Kyle Chiasson",
+          "short_name": "K. Chiasson",
+          "score": 23,
+          "score_display": "+23",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "CA",
+          "rating": 963
+        }
+      ]
+    },
+    {
+      "name": "Women's Pro Open",
+      "code": "FPO",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "Ohn Scoggins",
+          "short_name": "O. Scoggins",
+          "score": -29,
+          "score_display": "-29",
+          "round_score": "-10",
+          "thru": "F",
+          "country": "US",
+          "rating": 982
+        },
+        {
+          "place": 2,
+          "place_display": "2",
+          "name": "Jordan Lynds",
+          "short_name": "J. Lynds",
+          "score": -17,
+          "score_display": "-17",
+          "round_score": "-5",
+          "thru": "F",
+          "country": "US",
+          "rating": 945
+        },
+        {
+          "place": 3,
+          "place_display": "3",
+          "name": "Catrina Allen",
+          "short_name": "C. Allen",
+          "score": -16,
+          "score_display": "-16",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 958
+        },
+        {
+          "place": 4,
+          "place_display": "4",
+          "name": "Nid Ovathanasin",
+          "short_name": "N. Ovathanasin",
+          "score": -1,
+          "score_display": "-1",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 928
+        },
+        {
+          "place": 5,
+          "place_display": "5",
+          "name": "Morgan Lynds",
+          "short_name": "M. Lynds",
+          "score": 0,
+          "score_display": "E",
+          "round_score": "+3",
+          "thru": "F",
+          "country": "US",
+          "rating": 937
+        },
+        {
+          "place": 6,
+          "place_display": "6",
+          "name": "Sandy Gast",
+          "short_name": "S. Gast",
+          "score": 4,
+          "score_display": "+4",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 892
+        },
+        {
+          "place": 7,
+          "place_display": "7",
+          "name": "Rebecca Minnick",
+          "short_name": "R. Minnick",
+          "score": 5,
+          "score_display": "+5",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 859
+        },
+        {
+          "place": 8,
+          "place_display": "8",
+          "name": "Rebecca Frazer",
+          "short_name": "R. Frazer",
+          "score": 10,
+          "score_display": "+10",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 916
+        },
+        {
+          "place": 9,
+          "place_display": "9",
+          "name": "Ratana McMahon",
+          "short_name": "R. McMahon",
+          "score": 13,
+          "score_display": "+13",
+          "round_score": "+5",
+          "thru": "F",
+          "country": "US",
+          "rating": 897
+        },
+        {
+          "place": 10,
+          "place_display": "10",
+          "name": "Katana Taylor",
+          "short_name": "K. Taylor",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 863
+        },
+        {
+          "place": 11,
+          "place_display": "11",
+          "name": "Madison Borzick",
+          "short_name": "M. Borzick",
+          "score": 21,
+          "score_display": "+21",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 856
+        },
+        {
+          "place": 12,
+          "place_display": "12",
+          "name": "Amber Chiasson",
+          "short_name": "A. Chiasson",
+          "score": 19,
+          "score_display": "+19",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "CA",
+          "rating": 894
+        }
+      ]
+    },
+    {
+      "name": "Mixed Pro 40+",
+      "code": "MP40",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "Cale Leiviska",
+          "short_name": "C. Leiviska",
+          "score": -28,
+          "score_display": "-28",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 1035
+        },
+        {
+          "place": 2,
+          "place_display": "2",
+          "name": "JohnE McCray",
+          "short_name": "J. McCray",
+          "score": -26,
+          "score_display": "-26",
+          "round_score": "-5",
+          "thru": "F",
+          "country": "US",
+          "rating": 1014
+        },
+        {
+          "place": 3,
+          "place_display": "3",
+          "name": "Trevor Harbolt",
+          "short_name": "T. Harbolt",
+          "score": -14,
+          "score_display": "-14",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 994
+        },
+        {
+          "place": 4,
+          "place_display": "4",
+          "name": "Elijah Garrison",
+          "short_name": "E. Garrison",
+          "score": -6,
+          "score_display": "-6",
+          "round_score": "+3",
+          "thru": "F",
+          "country": "US",
+          "rating": 997
+        },
+        {
+          "place": 5,
+          "place_display": "5",
+          "name": "Cole Wehrheim",
+          "short_name": "C. Wehrheim",
+          "score": -1,
+          "score_display": "-1",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 996
+        },
+        {
+          "place": 6,
+          "place_display": "6",
+          "name": "Tony Hoffer",
+          "short_name": "T. Hoffer",
+          "score": 0,
+          "score_display": "E",
+          "round_score": "+10",
+          "thru": "F",
+          "country": "US",
+          "rating": 996
+        },
+        {
+          "place": 7,
+          "place_display": "T7",
+          "name": "Andrew Garrett",
+          "short_name": "A. Garrett",
+          "score": 1,
+          "score_display": "+1",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 972
+        },
+        {
+          "place": 7,
+          "place_display": "T7",
+          "name": "Mark Kistner",
+          "short_name": "M. Kistner",
+          "score": 1,
+          "score_display": "+1",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 969
+        },
+        {
+          "place": 9,
+          "place_display": "9",
+          "name": "David Eilers",
+          "short_name": "D. Eilers",
+          "score": 2,
+          "score_display": "+2",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 985
+        },
+        {
+          "place": 10,
+          "place_display": "10",
+          "name": "Chris Villa",
+          "short_name": "C. Villa",
+          "score": 3,
+          "score_display": "+3",
+          "round_score": "+7",
+          "thru": "F",
+          "country": "US",
+          "rating": 1009
+        },
+        {
+          "place": 11,
+          "place_display": "11",
+          "name": "Leif Force",
+          "short_name": "L. Force",
+          "score": 4,
+          "score_display": "+4",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 981
+        },
+        {
+          "place": 12,
+          "place_display": "12",
+          "name": "Jay Boogie",
+          "short_name": "J. Boogie",
+          "score": 7,
+          "score_display": "+7",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 990
+        },
+        {
+          "place": 13,
+          "place_display": "T13",
+          "name": "Scott Puskas",
+          "short_name": "S. Puskas",
+          "score": 8,
+          "score_display": "+8",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 966
+        },
+        {
+          "place": 13,
+          "place_display": "T13",
+          "name": "Robert Knoblauch",
+          "short_name": "R. Knoblauch",
+          "score": 8,
+          "score_display": "+8",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 952
+        },
+        {
+          "place": 15,
+          "place_display": "15",
+          "name": "Allen Hermosillo",
+          "short_name": "A. Hermosillo",
+          "score": 12,
+          "score_display": "+12",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 987
+        },
+        {
+          "place": 16,
+          "place_display": "T16",
+          "name": "Travis Webber",
+          "short_name": "T. Webber",
+          "score": 18,
+          "score_display": "+18",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 949
+        },
+        {
+          "place": 16,
+          "place_display": "T16",
+          "name": "Brian Glass",
+          "short_name": "B. Glass",
+          "score": 18,
+          "score_display": "+18",
+          "round_score": "+6",
+          "thru": "F",
+          "country": "US",
+          "rating": 951
+        },
+        {
+          "place": 16,
+          "place_display": "T16",
+          "name": "Bryan Sanetti",
+          "short_name": "B. Sanetti",
+          "score": 18,
+          "score_display": "+18",
+          "round_score": "+7",
+          "thru": "F",
+          "country": "US",
+          "rating": 929
+        },
+        {
+          "place": 16,
+          "place_display": "T16",
+          "name": "Taylor Dutto",
+          "short_name": "T. Dutto",
+          "score": 18,
+          "score_display": "+18",
+          "round_score": "+8",
+          "thru": "F",
+          "country": "US",
+          "rating": 956
+        },
+        {
+          "place": 20,
+          "place_display": "20",
+          "name": "Kenneth Hinchey",
+          "short_name": "K. Hinchey",
+          "score": 19,
+          "score_display": "+19",
+          "round_score": "+7",
+          "thru": "F",
+          "country": "US",
+          "rating": 931
+        },
+        {
+          "place": 21,
+          "place_display": "21",
+          "name": "David Slocum",
+          "short_name": "D. Slocum",
+          "score": 20,
+          "score_display": "+20",
+          "round_score": "+9",
+          "thru": "F",
+          "country": "US",
+          "rating": 947
+        },
+        {
+          "place": 22,
+          "place_display": "22",
+          "name": "Dan Hanson",
+          "short_name": "D. Hanson",
+          "score": 21,
+          "score_display": "+21",
+          "round_score": "+9",
+          "thru": "F",
+          "country": "US",
+          "rating": 933
+        },
+        {
+          "place": 23,
+          "place_display": "23",
+          "name": "Robert Gillis",
+          "short_name": "R. Gillis",
+          "score": 24,
+          "score_display": "+24",
+          "round_score": "+9",
+          "thru": "F",
+          "country": "US",
+          "rating": 933
+        },
+        {
+          "place": 24,
+          "place_display": "24",
+          "name": "Jonathan Hokes",
+          "short_name": "J. Hokes",
+          "score": 25,
+          "score_display": "+25",
+          "round_score": "+11",
+          "thru": "F",
+          "country": "US",
+          "rating": 934
+        },
+        {
+          "place": 25,
+          "place_display": "T25",
+          "name": "Braden Korn",
+          "short_name": "B. Korn",
+          "score": 27,
+          "score_display": "+27",
+          "round_score": "+11",
+          "thru": "F",
+          "country": "US",
+          "rating": 923
+        },
+        {
+          "place": 25,
+          "place_display": "T25",
+          "name": "Jimmy Quinn",
+          "short_name": "J. Quinn",
+          "score": 27,
+          "score_display": "+27",
+          "round_score": "+11",
+          "thru": "F",
+          "country": "US",
+          "rating": 911
+        },
+        {
+          "place": 27,
+          "place_display": "27",
+          "name": "Matthew Welborn",
+          "short_name": "M. Welborn",
+          "score": 35,
+          "score_display": "+35",
+          "round_score": "+13",
+          "thru": "F",
+          "country": "US",
+          "rating": 922
+        },
+        {
+          "place": 28,
+          "place_display": "28",
+          "name": "Alan Schutte",
+          "short_name": "A. Schutte",
+          "score": 9,
+          "score_display": "+9",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 972
+        },
+        {
+          "place": 29,
+          "place_display": "29",
+          "name": "Mike Hermes",
+          "short_name": "M. Hermes",
+          "score": 12,
+          "score_display": "+12",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 953
+        },
+        {
+          "place": 30,
+          "place_display": "T30",
+          "name": "Adam Schackmann",
+          "short_name": "A. Schackmann",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 964
+        },
+        {
+          "place": 30,
+          "place_display": "T30",
+          "name": "Marc Juliano",
+          "short_name": "M. Juliano",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 931
+        },
+        {
+          "place": 32,
+          "place_display": "32",
+          "name": "Drew Guy",
+          "short_name": "D. Guy",
+          "score": 19,
+          "score_display": "+19",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 948
+        },
+        {
+          "place": 33,
+          "place_display": "33",
+          "name": "Arthur Moody",
+          "short_name": "A. Moody",
+          "score": 20,
+          "score_display": "+20",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 924
+        },
+        {
+          "place": 34,
+          "place_display": "34",
+          "name": "James Polo",
+          "short_name": "J. Polo",
+          "score": 22,
+          "score_display": "+22",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 929
+        },
+        {
+          "place": 35,
+          "place_display": "35",
+          "name": "Joseph Kulp",
+          "short_name": "J. Kulp",
+          "score": 8,
+          "score_display": "+8",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 959
+        }
+      ]
+    },
+    {
+      "name": "Mixed Pro 50+",
+      "code": "MP50",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "Bob Kulchuk",
+          "short_name": "B. Kulchuk",
+          "score": -8,
+          "score_display": "-8",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 953
+        },
+        {
+          "place": 2,
+          "place_display": "T2",
+          "name": "Chris Stone",
+          "short_name": "C. Stone",
+          "score": -6,
+          "score_display": "-6",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 957
+        },
+        {
+          "place": 2,
+          "place_display": "T2",
+          "name": "Don Johnson",
+          "short_name": "D. Johnson",
+          "score": -6,
+          "score_display": "-6",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 960
+        },
+        {
+          "place": 4,
+          "place_display": "T4",
+          "name": "Jack Fan",
+          "short_name": "J. Fan",
+          "score": -2,
+          "score_display": "-2",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 954
+        },
+        {
+          "place": 4,
+          "place_display": "T4",
+          "name": "Chad Yeatts",
+          "short_name": "C. Yeatts",
+          "score": -2,
+          "score_display": "-2",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 962
+        },
+        {
+          "place": 6,
+          "place_display": "6",
+          "name": "Drew Miller",
+          "short_name": "D. Miller",
+          "score": 1,
+          "score_display": "+1",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 961
+        },
+        {
+          "place": 7,
+          "place_display": "7",
+          "name": "Ben Boyter",
+          "short_name": "B. Boyter",
+          "score": 3,
+          "score_display": "+3",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 926
+        },
+        {
+          "place": 8,
+          "place_display": "8",
+          "name": "Pete Wilson",
+          "short_name": "P. Wilson",
+          "score": 5,
+          "score_display": "+5",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 889
+        },
+        {
+          "place": 9,
+          "place_display": "9",
+          "name": "Norman Fitzgerald",
+          "short_name": "N. Fitzgerald",
+          "score": 10,
+          "score_display": "+10",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 933
+        },
+        {
+          "place": 10,
+          "place_display": "10",
+          "name": "Chris Jeffers",
+          "short_name": "C. Jeffers",
+          "score": 11,
+          "score_display": "+11",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 928
+        },
+        {
+          "place": 11,
+          "place_display": "11",
+          "name": "Ty Gage",
+          "short_name": "T. Gage",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+9",
+          "thru": "F",
+          "country": "US",
+          "rating": 873
+        },
+        {
+          "place": 12,
+          "place_display": "12",
+          "name": "John Kucaba",
+          "short_name": "J. Kucaba",
+          "score": 16,
+          "score_display": "+16",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 902
+        },
+        {
+          "place": 13,
+          "place_display": "13",
+          "name": "Brock Beeney",
+          "short_name": "B. Beeney",
+          "score": 29,
+          "score_display": "+29",
+          "round_score": "+8",
+          "thru": "F",
+          "country": "US",
+          "rating": 909
+        }
+      ]
+    },
+    {
+      "name": "Mixed Pro 55+",
+      "code": "MP55",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "Baxter Frost",
+          "short_name": "B. Frost",
+          "score": -7,
+          "score_display": "-7",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 968
+        },
+        {
+          "place": 2,
+          "place_display": "2",
+          "name": "Billy Seaman",
+          "short_name": "B. Seaman",
+          "score": -4,
+          "score_display": "-4",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 949
+        },
+        {
+          "place": 3,
+          "place_display": "T3",
+          "name": "Jay Bowman",
+          "short_name": "J. Bowman",
+          "score": -1,
+          "score_display": "-1",
+          "round_score": "-8",
+          "thru": "F",
+          "country": "US",
+          "rating": 948
+        },
+        {
+          "place": 3,
+          "place_display": "T3",
+          "name": "Damon Clark",
+          "short_name": "D. Clark",
+          "score": -1,
+          "score_display": "-1",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 938
+        },
+        {
+          "place": 5,
+          "place_display": "5",
+          "name": "Jay Dugmore",
+          "short_name": "J. Dugmore",
+          "score": 1,
+          "score_display": "+1",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 965
+        },
+        {
+          "place": 6,
+          "place_display": "6",
+          "name": "Alan Hause",
+          "short_name": "A. Hause",
+          "score": 3,
+          "score_display": "+3",
+          "round_score": "+3",
+          "thru": "F",
+          "country": "US",
+          "rating": 928
+        },
+        {
+          "place": 7,
+          "place_display": "7",
+          "name": "Mike Cain",
+          "short_name": "M. Cain",
+          "score": 5,
+          "score_display": "+5",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 941
+        },
+        {
+          "place": 8,
+          "place_display": "8",
+          "name": "Matt Turi",
+          "short_name": "M. Turi",
+          "score": 8,
+          "score_display": "+8",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 935
+        },
+        {
+          "place": 9,
+          "place_display": "9",
+          "name": "Ken Vella",
+          "short_name": "K. Vella",
+          "score": 9,
+          "score_display": "+9",
+          "round_score": "+7",
+          "thru": "F",
+          "country": "US",
+          "rating": 932
+        },
+        {
+          "place": 10,
+          "place_display": "T10",
+          "name": "Steve Greer",
+          "short_name": "S. Greer",
+          "score": 11,
+          "score_display": "+11",
+          "round_score": "+5",
+          "thru": "F",
+          "country": "US",
+          "rating": 933
+        },
+        {
+          "place": 10,
+          "place_display": "T10",
+          "name": "Eric Williams",
+          "short_name": "E. Williams",
+          "score": 11,
+          "score_display": "+11",
+          "round_score": "+6",
+          "thru": "F",
+          "country": "US",
+          "rating": 905
+        },
+        {
+          "place": 12,
+          "place_display": "T12",
+          "name": "Chuck Jaqueth",
+          "short_name": "C. Jaqueth",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 896
+        },
+        {
+          "place": 12,
+          "place_display": "T12",
+          "name": "Mark Guldner",
+          "short_name": "M. Guldner",
+          "score": 14,
+          "score_display": "+14",
+          "round_score": "+6",
+          "thru": "F",
+          "country": "US",
+          "rating": 915
+        },
+        {
+          "place": 14,
+          "place_display": "14",
+          "name": "Scott Sproule",
+          "short_name": "S. Sproule",
+          "score": 8,
+          "score_display": "+8",
+          "round_score": "+935",
+          "thru": "F",
+          "country": "US",
+          "rating": 925
+        }
+      ]
+    },
+    {
+      "name": "Mixed Pro 60+",
+      "code": "MP60",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "Randy Beers",
+          "short_name": "R. Beers",
+          "score": -22,
+          "score_display": "-22",
+          "round_score": "-9",
+          "thru": "F",
+          "country": "US",
+          "rating": 947
+        },
+        {
+          "place": 2,
+          "place_display": "2",
+          "name": "Laymon Gray",
+          "short_name": "L. Gray",
+          "score": -20,
+          "score_display": "-20",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 972
+        },
+        {
+          "place": 3,
+          "place_display": "3",
+          "name": "Andrew Back",
+          "short_name": "A. Back",
+          "score": -18,
+          "score_display": "-18",
+          "round_score": "-8",
+          "thru": "F",
+          "country": "US",
+          "rating": 954
+        },
+        {
+          "place": 4,
+          "place_display": "T4",
+          "name": "Gary Judd",
+          "short_name": "G. Judd",
+          "score": -15,
+          "score_display": "-15",
+          "round_score": "-6",
+          "thru": "F",
+          "country": "US",
+          "rating": 954
+        },
+        {
+          "place": 4,
+          "place_display": "T4",
+          "name": "James Luppino",
+          "short_name": "J. Luppino",
+          "score": -15,
+          "score_display": "-15",
+          "round_score": "-5",
+          "thru": "F",
+          "country": "US",
+          "rating": 928
+        },
+        {
+          "place": 6,
+          "place_display": "6",
+          "name": "Daniel Marcus",
+          "short_name": "D. Marcus",
+          "score": -13,
+          "score_display": "-13",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 940
+        },
+        {
+          "place": 7,
+          "place_display": "7",
+          "name": "Brendan Smith",
+          "short_name": "B. Smith",
+          "score": -12,
+          "score_display": "-12",
+          "round_score": "-3",
+          "thru": "F",
+          "country": "US",
+          "rating": 959
+        },
+        {
+          "place": 8,
+          "place_display": "8",
+          "name": "Rick Hunt",
+          "short_name": "R. Hunt",
+          "score": -10,
+          "score_display": "-10",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 926
+        },
+        {
+          "place": 9,
+          "place_display": "T9",
+          "name": "CR Willey",
+          "short_name": "C. Willey",
+          "score": -7,
+          "score_display": "-7",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 920
+        },
+        {
+          "place": 9,
+          "place_display": "T9",
+          "name": "Barry Flesch",
+          "short_name": "B. Flesch",
+          "score": -7,
+          "score_display": "-7",
+          "round_score": "E",
+          "thru": "F",
+          "country": "US",
+          "rating": 926
+        },
+        {
+          "place": 11,
+          "place_display": "T11",
+          "name": "James Jurden",
+          "short_name": "J. Jurden",
+          "score": -5,
+          "score_display": "-5",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 944
+        },
+        {
+          "place": 11,
+          "place_display": "T11",
+          "name": "Rick Bates",
+          "short_name": "R. Bates",
+          "score": -5,
+          "score_display": "-5",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 926
+        },
+        {
+          "place": 13,
+          "place_display": "13",
+          "name": "Doug Chase",
+          "short_name": "D. Chase",
+          "score": -4,
+          "score_display": "-4",
+          "round_score": "-1",
+          "thru": "F",
+          "country": "US",
+          "rating": 926
+        },
+        {
+          "place": 14,
+          "place_display": "14",
+          "name": "John Marcus",
+          "short_name": "J. Marcus",
+          "score": 2,
+          "score_display": "+2",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 902
+        },
+        {
+          "place": 15,
+          "place_display": "T15",
+          "name": "Todd Belrose",
+          "short_name": "T. Belrose",
+          "score": 6,
+          "score_display": "+6",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 916
+        },
+        {
+          "place": 15,
+          "place_display": "T15",
+          "name": "Rich Darter",
+          "short_name": "R. Darter",
+          "score": 6,
+          "score_display": "+6",
+          "round_score": "+7",
+          "thru": "F",
+          "country": "US",
+          "rating": 908
+        },
+        {
+          "place": 17,
+          "place_display": "17",
+          "name": "Bill Giroux",
+          "short_name": "B. Giroux",
+          "score": 3,
+          "score_display": "+3",
+          "round_score": "+937",
+          "thru": "F",
+          "country": "US",
+          "rating": 929
+        }
+      ]
+    },
+    {
+      "name": "Mixed Pro 65+",
+      "code": "MP65",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "J. Gary Dropcho",
+          "short_name": "J. Dropcho",
+          "score": -15,
+          "score_display": "-15",
+          "round_score": "-4",
+          "thru": "F",
+          "country": "US",
+          "rating": 938
+        },
+        {
+          "place": 2,
+          "place_display": "2",
+          "name": "Bill Rohe",
+          "short_name": "B. Rohe",
+          "score": -14,
+          "score_display": "-14",
+          "round_score": "-7",
+          "thru": "F",
+          "country": "US",
+          "rating": 951
+        },
+        {
+          "place": 3,
+          "place_display": "3",
+          "name": "Dan Rigg",
+          "short_name": "D. Rigg",
+          "score": -12,
+          "score_display": "-12",
+          "round_score": "-7",
+          "thru": "F",
+          "country": "US",
+          "rating": 950
+        },
+        {
+          "place": 4,
+          "place_display": "4",
+          "name": "Mark Barber",
+          "short_name": "M. Barber",
+          "score": -9,
+          "score_display": "-9",
+          "round_score": "-2",
+          "thru": "F",
+          "country": "US",
+          "rating": 941
+        },
+        {
+          "place": 5,
+          "place_display": "5",
+          "name": "Steve Hardyman",
+          "short_name": "S. Hardyman",
+          "score": -7,
+          "score_display": "-7",
+          "round_score": "-7",
+          "thru": "F",
+          "country": "US",
+          "rating": 904
+        },
+        {
+          "place": 6,
+          "place_display": "6",
+          "name": "Stephen Schickler",
+          "short_name": "S. Schickler",
+          "score": -2,
+          "score_display": "-2",
+          "round_score": "+2",
+          "thru": "F",
+          "country": "US",
+          "rating": 947
+        },
+        {
+          "place": 7,
+          "place_display": "7",
+          "name": "Anthony Gruszka",
+          "short_name": "A. Gruszka",
+          "score": 2,
+          "score_display": "+2",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 913
+        },
+        {
+          "place": 8,
+          "place_display": "8",
+          "name": "Danny McDonnell",
+          "short_name": "D. McDonnell",
+          "score": 7,
+          "score_display": "+7",
+          "round_score": "+4",
+          "thru": "F",
+          "country": "US",
+          "rating": 899
+        },
+        {
+          "place": 9,
+          "place_display": "9",
+          "name": "Keith Johnson",
+          "short_name": "K. Johnson",
+          "score": 28,
+          "score_display": "+28",
+          "round_score": "+10",
+          "thru": "F",
+          "country": "US",
+          "rating": 876
+        }
+      ]
+    },
+    {
+      "name": "Mixed Pro 70+",
+      "code": "MP70",
+      "round": 3,
+      "players": [
+        {
+          "place": 1,
+          "place_display": "1",
+          "name": "John Weber",
+          "short_name": "J. Weber",
+          "score": 8,
+          "score_display": "+8",
+          "round_score": "+1",
+          "thru": "F",
+          "country": "US",
+          "rating": 836
+        }
+      ]
+    }
+  ]
+};
+    
+    
+renderScores(SCORES);
+document.getElementById("event-name").textContent = SCORES.event_name || "PDGA Event";
+document.getElementById("event-round").textContent = SCORES.event_round || "";
+document.getElementById("loading").style.display = "none";
+scrollStartTime = performance.now();
+  </script>
+</body>
+
+</html>

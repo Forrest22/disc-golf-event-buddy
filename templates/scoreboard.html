@@ -1,546 +1,406 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}PDGA Live Scoreboard{% endblock %}</title>
-    <link
-      rel="stylesheet"
-      href="{% block theme_css_path %}/static/theme.css{% endblock %}"
-    />
-    <style>
-      /* ── Scoreboard-specific variables not in theme.css ── */
-      :root { --header-h: 72px; }
 
-      html, body { height: 100%; overflow: hidden; }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}PDGA Live Scoreboard{% endblock %}</title>
+  <link rel="stylesheet" href="{% block theme_css_path %}/static/theme.css{% endblock %}" />
+  <style>
+    /* ── Scoreboard-specific variables not in theme.css ── */
+    :root {
+      --header-h: 72px;
+    }
 
-      /* Light mode header override */
-      html.light #header { background: linear-gradient(90deg, #e0e8f0 0%, #d0dce8 60%, #e0e8f0 100%); }
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
 
-      /* ── Header ── */
-      #header {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        height: var(--header-h);
-        background: linear-gradient(90deg, #0d1520 0%, #112233 60%, #0d1520 100%);
-        border-bottom: 2px solid var(--accent);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 36px;
-        z-index: 100;
+    /* Light mode header override */
+    html.light #header {
+      background: linear-gradient(90deg, #e0e8f0 0%, #d0dce8 60%, #e0e8f0 100%);
+    }
+
+    /* ── Header ── */
+    #header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: linear-gradient(90deg, #0d1520 0%, #112233 60%, #0d1520 100%);
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      z-index: 100;
+    }
+
+    #header .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    #header .disc-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 16px rgba(0, 200, 150, 0.4);
+    }
+
+    #event-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    #event-round {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    #header .right {
+      text-align: right;
+    }
+
+    /* ── Header right-top row: Live · Dark/Light · Settings ── */
+    .right-top {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    #live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    #live-badge .dot {
+      width: 7px;
+      height: 7px;
+      background: #fff;
+      border-radius: 50%;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
       }
 
-      #header .logo-area {
-        display: flex;
-        align-items: center;
-        gap: 14px;
+      50% {
+        opacity: 0.2;
       }
+    }
 
-      #header .disc-icon {
-        width: 40px; height: 40px;
-        border-radius: 50%;
-        border: 3px solid var(--accent);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 20px;
-        box-shadow: 0 0 16px rgba(0,200,150,0.4);
-      }
+    /* Shared pill-button style for theme toggle and settings link */
+    #theme-btn,
+    #back-link {
+      display: inline-block;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
 
-      #event-name {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        color: var(--text);
-      }
+    #theme-btn:hover,
+    #back-link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
 
-      #event-round {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--accent);
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-top: 2px;
-      }
+    #last-updated {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
 
-      #header .right { text-align: right; }
+    #cache-badge {
+      color: var(--gold);
+      font-weight: 600;
+      margin-right: 2px;
+    }
 
-      /* ── Header right-top row: Live · Dark/Light · Settings ── */
-      .right-top {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-      }
+    /* ── Scroll viewport ── */
+    #scroll-viewport {
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+    }
 
-      #live-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--red);
-        color: #fff;
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 2px;
-        padding: 4px 10px;
-        border-radius: 4px;
-        text-transform: uppercase;
-      }
+    #scroll-track {
+      display: flex;
+      flex-direction: column;
+      will-change: transform;
+    }
 
-      #live-badge .dot {
-        width: 7px; height: 7px;
-        background: #fff;
-        border-radius: 50%;
-        animation: blink 1.2s ease-in-out infinite;
-      }
+    /* ── Division block ── */
+    .division {
+      padding: 28px 40px 12px;
+    }
 
-      @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50%       { opacity: 0.2; }
-      }
+    .division-header {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-bottom: 6px;
+    }
 
-      /* Shared pill-button style for theme toggle and settings link */
-      #theme-btn, #back-link {
-        display: inline-block;
-        background: none;
-        border: 1px solid var(--border);
-        border-radius: 5px;
-        color: var(--muted);
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        padding: 3px 8px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: color 0.2s, border-color 0.2s;
-      }
-      #theme-btn:hover, #back-link:hover {
-        color: var(--accent);
-        border-color: var(--accent);
-      }
+    /* ── Score table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-      #last-updated {
-        font-size: 12px;
-        color: var(--muted);
-        margin-top: 4px;
-      }
+    thead th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 10px;
+      text-align: left;
+    }
 
-      #cache-badge {
-        color: var(--gold);
-        font-weight: 600;
-        margin-right: 2px;
-      }
+    thead th.num {
+      text-align: right;
+    }
 
-      /* ── Scroll viewport ── */
-      #scroll-viewport {
-        position: fixed;
-        top: var(--header-h);
-        left: 0; right: 0; bottom: 0;
-        overflow: hidden;
-      }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
 
-      #scroll-track {
-        display: flex;
-        flex-direction: column;
-        will-change: transform;
-      }
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
 
-      /* ── Division block ── */
-      .division {
-        padding: 28px 40px 12px;
-      }
+    tbody td {
+      padding: 10px 10px;
+      font-size: 17px;
+    }
 
-      .division-header {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        color: var(--accent);
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 8px;
-        margin-bottom: 6px;
-      }
+    /* Place column */
+    td.place {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      width: 48px;
+      color: var(--muted);
+    }
 
-      /* ── Score table ── */
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
+    td.place.p1 {
+      color: var(--gold);
+    }
 
-      thead th {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--muted);
-        padding: 6px 10px;
-        text-align: left;
-      }
+    td.place.p2 {
+      color: var(--silver);
+    }
 
-      thead th.num { text-align: right; }
+    td.place.p3 {
+      color: var(--bronze);
+    }
 
-      tbody tr {
-        border-bottom: 1px solid var(--border);
-        transition: background 0.2s;
-      }
+    /* Name column */
+    td.name {
+      font-weight: 500;
+      font-size: 18px;
+    }
 
-      tbody tr:hover { background: rgba(255,255,255,0.03); }
+    /* Score column */
+    td.score {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      text-align: right;
+      width: 90px;
+    }
 
-      tbody td {
-        padding: 10px 10px;
-        font-size: 17px;
-      }
+    td.score.under {
+      color: var(--accent);
+    }
 
-      /* Place column */
-      td.place {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 15px;
-        font-weight: 700;
-        width: 48px;
-        color: var(--muted);
-      }
+    td.score.over {
+      color: var(--red);
+    }
 
-      td.place.p1 { color: var(--gold); }
-      td.place.p2 { color: var(--silver); }
-      td.place.p3 { color: var(--bronze); }
+    td.score.even {
+      color: var(--muted);
+    }
 
-      /* Name column */
-      td.name {
-        font-weight: 500;
-        font-size: 18px;
-      }
+    /* Round and Thru columns — identical typography */
+    td.round-score,
+    td.thru {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      text-align: right;
+      color: var(--muted);
+    }
 
-      /* Score column */
-      td.score {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-weight: 800;
-        font-size: 22px;
-        text-align: right;
-        width: 90px;
-      }
+    td.round-score {
+      width: 72px;
+    }
 
-      td.score.under { color: var(--accent); }
-      td.score.over  { color: var(--red); }
-      td.score.even  { color: var(--muted); }
+    td.thru {
+      width: 56px;
+    }
 
-      /* Round and Thru columns — identical typography */
-      td.round-score, td.thru {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-weight: 700;
-        font-size: 17px;
-        text-align: right;
-        color: var(--muted);
-      }
+    /* Country badge */
+    span.country {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--muted);
+      background: var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
 
-      td.round-score { width: 72px; }
-      td.thru        { width: 56px; }
+    /* ── Gap spacer between divisions ── */
+    .spacer {
+      height: 24px;
+    }
 
-      /* Country badge */
-      span.country {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 1px;
-        color: var(--muted);
-        background: var(--border);
-        border-radius: 3px;
-        padding: 1px 5px;
-        margin-left: 8px;
-        vertical-align: middle;
-      }
+    /* ── Loading state ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+      z-index: 200;
+    }
 
-      /* ── Gap spacer between divisions ── */
-      .spacer { height: 24px; }
+    /* ── Pause overlay (mouse move) ── */
+    #paused-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 28px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #a0b8cc;
+      /* fixed light color — badge bg is always dark */
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
 
-      /* ── Loading state ── */
-      #loading {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--bg);
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 24px;
-        letter-spacing: 4px;
-        color: var(--muted);
-        text-transform: uppercase;
-        z-index: 200;
-      }
+    #paused-badge.visible {
+      opacity: 1;
+    }
 
-      /* ── Pause overlay (mouse move) ── */
-      #paused-badge {
-        position: fixed;
-        bottom: 20px;
-        right: 28px;
-        background: rgba(0,0,0,0.75);
-        color: #a0b8cc;  /* fixed light color — badge bg is always dark */
-        font-family: 'Barlow Condensed', sans-serif;
-        font-size: 13px;
-        letter-spacing: 2px;
-        padding: 6px 14px;
-        border-radius: 4px;
-        text-transform: uppercase;
-        opacity: 0;
-        transition: opacity 0.4s;
-        pointer-events: none;
-      }
-      #paused-badge.visible { opacity: 1; }
-      {% block extra_css %}{% endblock %}
-    </style>
-  </head>
-  <body>
-    <div id="loading">Loading scores…</div>
+      {
+      % block extra_css %
+    }
 
-    <!-- Header -->
-    <div id="header">
-      <div class="logo-area">
-        <div class="disc-icon">🥏</div>
-        <div>
-          <div id="event-name">Loading event…</div>
-          <div id="event-round"></div>
-        </div>
-      </div>
-      <div class="right">
-        <div class="right-top">
-          {% block header_badges %}
-          <div id="live-badge"><span class="dot"></span> Live</div>
-          <button id="theme-btn">☀️ Light</button>
-          <a href="/" id="back-link">⚙ Settings</a>
-          {% endblock %}
-        </div>
-        <div id="last-updated">
-          {% block last_updated_text %}Fetching…{% endblock %}
-        </div>
+      {
+      % endblock %
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loading">Loading scores…</div>
+
+  <!-- Header -->
+  <div id="header">
+    <div class="logo-area">
+      <div class="disc-icon">🥏</div>
+      <div>
+        <div id="event-name">Loading event…</div>
+        <div id="event-round"></div>
       </div>
     </div>
-
-    <!-- Scrolling content -->
-    <div id="scroll-viewport">
-      <div id="scroll-track"></div>
+    <div class="right">
+      <div class="right-top">
+        {% block header_badges %}
+        <div id="live-badge"><span class="dot"></span> Live</div>
+        <button id="theme-btn">☀️ Light</button>
+        <a href="/" id="back-link">⚙ Settings</a>
+        {% endblock %}
+      </div>
+      <div id="last-updated">{% block last_updated_text %}Fetching…{% endblock %}</div>
     </div>
+  </div>
 
-    <div id="paused-badge">⏸ Scroll paused</div>
-    {% block extra_html %}{% endblock %}
+  <!-- Scrolling content -->
+  <div id="scroll-viewport">
+    <div id="scroll-track"></div>
+  </div>
 
-    <script>
-      {% block data_js %}{% endblock %}
-      {% block fetch_js %}
-      // ── Cookie helpers ────────────────────────────────────────────
-      const Cookies = {
-        get(name, fallback = null) {
-          const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-          if (!match) return fallback;
-          try { return JSON.parse(decodeURIComponent(match[1])); } catch { return fallback; }
-        },
-      };
+  <div id="paused-badge">⏸ Scroll paused</div>
+  {% block extra_html %}{% endblock %}
 
-      // ── Load settings from cookies (set on landing page) ─────────
-      const SCROLL_PX_S          = Cookies.get("scrollSpeed", 60);
-      const POLL_MS              = Cookies.get("pollInterval", 30) * 1000;
-      const DIVISION_FILTER      = new Set(Cookies.get("divisionFilter", [])); // empty = show all
-      const PAUSE_AFTER_MOUSE_MS = 3000; // resume scroll N ms after last mouse move
+  <script src="{% block scoreboard_js_src %}/static/scoreboard.js{% endblock %}"></script>
+  <script>
+    {% block data_js %} {% endblock %}
+    {% block fetch_js %} fetchAndRender(); {% endblock %}
+    {% block init_js %} {% endblock %}
+  </script>
+</body>
 
-      // ── Apply saved theme immediately (before paint, avoids flash) ─
-      if (Cookies.get("theme", "dark") === "light") {
-        document.documentElement.classList.add("light");
-      }
-
-      // ── DOM refs ──────────────────────────────────────────────────
-      const track       = document.getElementById("scroll-track");
-      const viewport    = document.getElementById("scroll-viewport");
-      const loading     = document.getElementById("loading");
-      const pausedBadge = document.getElementById("paused-badge");
-
-      // ── Scroll state ──────────────────────────────────────────────
-      let scrollY         = 0;
-      let paused          = false;
-      let lastMouseMove   = 0;
-      let lastRender      = null;
-      let totalHeight     = 0;
-      let vpHeight        = 0;
-      let scrollStartTime = null; // set when first render completes; scroll waits 2s after this
-
-      // ── Theme toggle ──────────────────────────────────────────────
-      function updateThemeBtn() {
-        const light = document.documentElement.classList.contains("light");
-        const btn   = document.getElementById("theme-btn");
-        if (btn) btn.textContent = light ? "🌙 Dark" : "☀️ Light";
-      }
-      updateThemeBtn();
-
-      document.getElementById("theme-btn").addEventListener("click", () => {
-        const nowLight = document.documentElement.classList.toggle("light");
-        const val = nowLight ? "light" : "dark";
-        document.cookie = `theme=${encodeURIComponent(JSON.stringify(val))};path=/;max-age=31536000`;
-        updateThemeBtn();
-      });
-
-      // ── Fetch & render ────────────────────────────────────────────
-      let pollTimer = null;
-
-      async function fetchAndRender() {
-        try {
-          const res  = await fetch("/api/scores");
-          const data = await res.json();
-
-          const hasDivisions = data.divisions && data.divisions.length > 0;
-
-          if (hasDivisions) {
-            renderScores(data);
-            loading.style.display = "none";
-            // Start the 2-second delay on the very first render only
-            if (scrollStartTime === null) scrollStartTime = performance.now();
-
-            const fromCache   = data.from_cache === true;
-            const updatedEl   = document.getElementById("last-updated");
-            // Check if the tournament end date has passed — if so, don't
-            // imply we're still fetching live updates
-            const endDate     = data.end_date ? new Date(data.end_date) : null;
-            const isOver      = endDate && endDate < new Date();
-            if (data.last_updated) {
-              updatedEl.innerHTML = (fromCache && !isOver)
-                ? `<span id="cache-badge">● Cached</span> as of ${data.last_updated} — fetching live…`
-                : `Updated ${data.last_updated}`;
-            } else {
-              updatedEl.textContent = "";
-            }
-
-            // Normal poll interval once we have data
-            clearTimeout(pollTimer);
-            pollTimer = setTimeout(fetchAndRender, POLL_MS);
-          } else {
-            // Scraper hasn't returned data yet — show message and retry quickly
-            loading.style.display = "flex";
-            loading.textContent = data.event_name === "Loading…"
-              ? "Fetching scores from PDGA…"
-              : `Loading ${data.event_name}…`;
-            clearTimeout(pollTimer);
-            pollTimer = setTimeout(fetchAndRender, 2000);
-          }
-
-        } catch (e) {
-          console.error("Score fetch failed:", e);
-          loading.style.display = "flex";
-          loading.textContent = "Connection error — retrying…";
-          clearTimeout(pollTimer);
-          pollTimer = setTimeout(fetchAndRender, 3000);
-        }
-      }
-
-      {% endblock %}
-
-      // ── Render scores into the scroll track ──────────────────────
-      function renderScores(data) {
-        document.getElementById("event-name").textContent  = data.event_name  || "PDGA Event";
-        document.getElementById("event-round").textContent = data.event_round || "";
-
-        track.innerHTML = "";
-
-        // Filter divisions by cookie setting (empty set = show all)
-        const divisions = (data.divisions || []).filter(div =>
-          DIVISION_FILTER.size === 0 || DIVISION_FILTER.has(div.code)
-        );
-
-        divisions.forEach(div => {
-          const el = document.createElement("div");
-          el.className = "division";
-          el.innerHTML = `
-            <div class="division-header">${div.name} &mdash; ${div.round ? 'Rd ' + div.round : ''}</div>
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:52px">#</th>
-                  <th>Player</th>
-                  <th class="num" style="width:80px">Total</th>
-                  <th class="num" style="width:72px">Round</th>
-                  <th class="num" style="width:56px">Thru</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${div.players.map(p => `
-                  <tr>
-                    <td class="place ${p.place === 1 ? 'p1' : p.place === 2 ? 'p2' : p.place === 3 ? 'p3' : ''}">
-                      ${p.place === 1 ? '🥇' : p.place === 2 ? '🥈' : p.place === 3 ? '🥉' : p.place_display}
-                    </td>
-                    <td class="name">
-                      ${p.name}
-                      ${p.country ? `<span class="country">${p.country}</span>` : ''}
-                    </td>
-                    <td class="score ${scoreClass(p.score)}">${p.score_display}</td>
-                    <td class="round-score ${scoreClass(p.score)}" style="opacity:0.65">${p.round_score}</td>
-                    <td class="thru">${p.thru}</td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>
-          `;
-          track.appendChild(el);
-
-          const spacer = document.createElement("div");
-          spacer.className = "spacer";
-          track.appendChild(spacer);
-        });
-
-        // Duplicate content for seamless loop
-        track.innerHTML += track.innerHTML;
-
-        vpHeight    = viewport.clientHeight;
-        totalHeight = track.scrollHeight / 2; // half because content is duplicated
-      }
-
-      function scoreClass(score) {
-        if (score < 0) return "under";
-        if (score > 0) return "over";
-        return "even";
-      }
-
-      // ── Smooth scroll loop ────────────────────────────────────────
-      const SCROLL_DELAY_MS = 2000; // wait this long after first render before scrolling
-
-      function scrollLoop(ts) {
-        const scrollReady = scrollStartTime !== null && (ts - scrollStartTime) >= SCROLL_DELAY_MS;
-        if (lastRender !== null && !paused && scrollReady) {
-          const delta = (ts - lastRender) / 1000; // seconds
-          scrollY += SCROLL_PX_S * delta;
-
-          // Seamless loop: when we've scrolled one full copy, reset
-          if (totalHeight > 0 && scrollY >= totalHeight) {
-            scrollY -= totalHeight;
-          }
-
-          track.style.transform = `translateY(-${scrollY}px)`;
-        }
-
-        // Auto-resume after mouse idle
-        if (paused && (Date.now() - lastMouseMove) > PAUSE_AFTER_MOUSE_MS) {
-          paused = false;
-          pausedBadge.classList.remove("visible");
-        }
-
-        lastRender = ts;
-        requestAnimationFrame(scrollLoop);
-      }
-
-      // ── Mouse pause ───────────────────────────────────────────────
-      document.addEventListener("mousemove", () => {
-        lastMouseMove = Date.now();
-        paused = true;
-        pausedBadge.classList.add("visible");
-      });
-
-      // ── Init ──────────────────────────────────────────────────────
-      {% block init_js %}
-      fetchAndRender();
-      {% endblock %}
-      requestAnimationFrame(scrollLoop);
-    </script>
-  </body>
 </html>
