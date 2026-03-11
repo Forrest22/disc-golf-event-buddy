@@ -24,10 +24,11 @@ poll for updates. Re-run this script and push to refresh.
 
 import argparse
 import json
+import requests
 import shutil
+import sys
 from datetime import datetime
 from pathlib import Path
-import requests
 
 import jinja2
 
@@ -270,9 +271,8 @@ def build(tourn_id: str, out_path: Path, gh_repo: str):
     build_html(scores, out_path, gh_repo)
     print(f"  Event    : {scores['event_name']}")
 
-    # Copy static assets alongside the output
     static_dir = _find_dir("static")
-    for asset in ["theme.css", "scoreboard.js"]:
+    for asset in ["theme.css", "scoreboard.js", "landing.js"]:
         src = static_dir / asset
         dst = out_path / asset
         if src.exists():
@@ -283,7 +283,6 @@ def build(tourn_id: str, out_path: Path, gh_repo: str):
 
 
 def build_html(scores: dict, out_path: Path, gh_repo: str):
-    """Render a static landing page pre-populated with the tournament and divisions."""
     divisions = scores.get("divisions", [])
     if not divisions:
         print("Warning: no division data returned. The page will be blank.")
@@ -328,6 +327,7 @@ def build_html(scores: dict, out_path: Path, gh_repo: str):
     print(f"Written to {landing_path}  ({landing_path.stat().st_size // 1024} KB)")
 
 
+
 # ─────────────────────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────────────────────
@@ -337,6 +337,8 @@ def main():
         description="Build a static GitHub Pages scoreboard snapshot."
     )
     parser.add_argument("--tourn-id", "-t", help="PDGA tournament ID to snapshot")
+    parser.add_argument("--out", "-o", default="docs/index.html",
+                        help="Output path (default: docs/index.html)")
     parser.add_argument("--repo", "-r", default="your-username/disc-golf-event-buddy",
                         help="GitHub repo slug shown in the footer")
     parser.add_argument("--list-events", "-l", action="store_true",
