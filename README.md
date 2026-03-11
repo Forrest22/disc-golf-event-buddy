@@ -42,7 +42,7 @@ python app.py
 http://localhost:5000
 ```
 
-Select your tournament, configure settings, and click **Launch Scoreboard**. On the TV machine, press `F11` for fullscreen.
+Select your tournament, configure settings, and click **Launch Scoreboard**. Press `F11` for fullscreen and CTRL = and CTRL - to increase or decrease text size.
 
 ---
 

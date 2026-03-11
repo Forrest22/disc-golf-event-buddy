@@ -189,24 +189,30 @@ def _build_scores(tourn_id: str) -> dict:
         if not players_raw:
             continue
 
+        # PDGA uses 999 (offset to ~+935 after par adjustment) as a sentinel
+        # for DNF/incomplete rounds. Treat any round score >= 900 as DNF.
+        DNF_SENTINEL = 900
+
         players_out = []
         for p in players_raw:
             place     = int(p["RunningPlace"]) if p.get("RunningPlace") is not None else 0
             tied      = bool(p.get("Tied", False))
-            to_par    = p.get("ToPar")    # may be None (player hasn't started)
+            to_par    = p.get("ToPar")
             round_par = p.get("RoundtoPar")
             played    = int(p["Played"])  if p.get("Played")  is not None else 0
             completed = bool(p.get("Completed", 0))
             holes     = int(p["Holes"])   if p.get("Holes")   is not None else 18
+
+            dnf = round_par is not None and int(round_par) >= DNF_SENTINEL
 
             players_out.append({
                 "place":         place,
                 "place_display": f"T{place}" if tied else str(place),
                 "name":          p.get("Name", "Unknown"),
                 "short_name":    p.get("ShortName", p.get("Name", "")),
-                "score":         to_par,
-                "score_display": format_score(to_par),
-                "round_score":   format_score(round_par),
+                "score":         None if dnf else to_par,
+                "score_display": "DNF" if dnf else format_score(to_par),
+                "round_score":   "DNF" if dnf else format_score(round_par),
                 "thru":          format_thru(played, completed, holes),
                 "country":       p.get("Country", ""),
                 "rating":        p.get("Rating"),

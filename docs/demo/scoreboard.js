@@ -19,7 +19,7 @@ const Cookies = {
 
 // -- Settings from cookies (set on landing page) -------------------
 const SCROLL_PX_S = Cookies.get("scrollSpeed", 60);
-const POLL_MS = Cookies.get("pollInterval", 30) * 1000;
+const POLL_MS = Math.max(5000, (Cookies.get("pollInterval", 30) || 30) * 1000);
 const DIVISION_FILTER = new Set(Cookies.get("divisionFilter", []));
 const PAUSE_AFTER_MOUSE_MS = 3000;
 const SCROLL_DELAY_MS = 2000;
@@ -98,8 +98,8 @@ function renderScores(data) {
                 ${p.name}
                 ${p.country ? `<span class="country">${p.country}</span>` : ""}
               </td>
-              <td class="score ${scoreClass(p.score)}">${p.score_display}</td>
-              <td class="round-score ${scoreClass(p.score)}" style="opacity:0.65">${p.round_score}</td>
+              <td class="score ${p.score_display === "DNF" ? "dnf" : scoreClass(p.score)}">${p.score_display}</td>
+              <td class="round-score ${p.round_score === "DNF" ? "dnf" : scoreClass(p.score)}" style="opacity:0.65">${p.round_score}</td>
               <td class="thru">${p.thru}</td>
             </tr>
           `,
@@ -130,6 +130,7 @@ function scoreClass(score) {
 let pollTimer = null;
 
 async function fetchAndRender() {
+  clearTimeout(pollTimer); // cancel any pending timer before we do anything
   try {
     const res = await fetch("/api/scores");
     const data = await res.json();

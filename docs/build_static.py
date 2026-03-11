@@ -24,11 +24,10 @@ poll for updates. Re-run this script and push to refresh.
 
 import argparse
 import json
-import requests
 import shutil
-import sys
 from datetime import datetime
 from pathlib import Path
+import requests
 
 import jinja2
 
@@ -118,6 +117,8 @@ def _build_scores(tourn_id: str) -> dict:
         if not players_raw:
             continue
 
+        DNF_SENTINEL = 900
+
         players_out = []
         for p in players_raw:
             place     = int(p["RunningPlace"]) if p.get("RunningPlace") is not None else 0
@@ -128,14 +129,16 @@ def _build_scores(tourn_id: str) -> dict:
             completed = bool(p.get("Completed", 0))
             holes     = int(p["Holes"])   if p.get("Holes")   is not None else 18
 
+            dnf = round_par is not None and int(round_par) >= DNF_SENTINEL
+
             players_out.append({
                 "place":         place,
                 "place_display": f"T{place}" if tied else str(place),
                 "name":          p.get("Name", "Unknown"),
                 "short_name":    p.get("ShortName", p.get("Name", "")),
-                "score":         to_par,
-                "score_display": format_score(to_par),
-                "round_score":   format_score(round_par),
+                "score":         None if dnf else to_par,
+                "score_display": "DNF" if dnf else format_score(to_par),
+                "round_score":   "DNF" if dnf else format_score(round_par),
                 "thru":          format_thru(played, completed, holes),
                 "country":       p.get("Country", ""),
                 "rating":        p.get("Rating"),
@@ -257,10 +260,7 @@ def _load_cache(tourn_id: str) -> dict | None:
 
 
 def build(tourn_id: str, out_path: Path, gh_repo: str):
-    # Try the local SQLite cache first — avoids hitting PDGA directly
-    # (which often returns 403 outside of a browser session).
     scores = _load_cache(tourn_id)
-
     if scores:
         print(f"Fetching scores for TournID={tourn_id}... (from cache)")
     else:
@@ -299,8 +299,6 @@ def build_html(scores: dict, out_path: Path, gh_repo: str):
         snapshot_date = snapshot_date,
         gh_repo       = gh_repo,
     )
-    # Inject scores via plain string replace so JSON never touches
-    # Jinja2's autoescape or whitespace pipeline.
     html = html.replace("__SCORES_JSON__", _json_for_script(scores))
 
     scoreboard_path = out_path / "scoreboard.html"
@@ -320,7 +318,6 @@ def build_html(scores: dict, out_path: Path, gh_repo: str):
     }
     divs = [{"code": d["code"], "name": d["name"]} for d in scores.get("divisions", [])]
 
-    env      = make_jinja_env()
     template = env.get_template("landing-static.html")
     html     = template.render(event_name=scores["event_name"], gh_repo=gh_repo)
     html     = html.replace("__EVENT_JSON__", _json_for_script(event_info))
